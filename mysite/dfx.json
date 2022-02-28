@@ -1,5 +1,9 @@
 {
   "canisters": {
+    "myCounter": {
+      "main": "src/mysite/Counter.mo",
+      "type": "motoko"
+    },
     "mysite": {
       "main": "src/mysite/main.mo",
       "type": "motoko"
