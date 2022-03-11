@@ -57,17 +57,23 @@ actor Microblog{
     var _all : List.List<Message> = List.nil();
 
     for(pid in Iter.fromList(_following)) {
-      let canister : InterfaceMicroblog = actor(Principal.toText(pid));
-      var _msgs = await canister.posts(sience);
-
-      for(_m in Iter.fromArray(_msgs)){
-        switch (sience) {
-          case (0) { 
-            _all := List.push<Message>(_m, _all);
-          };
-          case (time) { 
-            if(time <= _m.time){
-               _all := List.push<Message>(_m, _all);
+      var _msgs: [Message] = [];
+      try{
+        let canister : InterfaceMicroblog = actor(Principal.toText(pid));
+        _msgs := await canister.posts(sience);
+      }catch(err){
+        _msgs := [];
+      };
+      if(_msgs.size() > 0){
+        for(_m in Iter.fromArray(_msgs)){
+          switch (sience) {
+            case (0) { 
+              _all := List.push<Message>(_m, _all);
+            };
+            case (time) { 
+              if(time <= _m.time){
+                _all := List.push<Message>(_m, _all);
+              };
             };
           };
         };
