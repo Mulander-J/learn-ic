@@ -1,15 +1,15 @@
-import { mysite } from "../../declarations/mysite";
+import { microblog } from "../../declarations/microblog";
 
 document.querySelector("form").addEventListener("submit", async (e) => {
   e.preventDefault();
   const button = e.target.querySelector("button");
 
-  const name = document.getElementById("name").value.toString();
+  // const name = document.getElementById("name").value.toString();
 
   button.setAttribute("disabled", true);
 
   // Interact with foo actor, calling the greet method
-  const greeting = await mysite.greet(name);
+  const greeting = await microblog.getName();
 
   button.removeAttribute("disabled");
 

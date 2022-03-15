@@ -1,5 +1,0 @@
-service : {
-  fibonaci: (nat) -> (nat);
-  greet: (text) -> (text);
-  quickSort: (vec int) -> (vec int);
-}

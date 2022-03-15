@@ -1,16 +1,16 @@
 import { Actor, HttpAgent } from "@dfinity/agent";
 
 // Imports and re-exports candid interface
-import { idlFactory } from './mysite_assets.did.js';
-export { idlFactory } from './mysite_assets.did.js';
+import { idlFactory } from './microblog_assets.did.js';
+export { idlFactory } from './microblog_assets.did.js';
 // CANISTER_ID is replaced by webpack based on node environment
-export const canisterId = process.env.MYSITE_ASSETS_CANISTER_ID;
+export const canisterId = process.env.MICROBLOG_ASSETS_CANISTER_ID;
 
 /**
  * 
  * @param {string | import("@dfinity/principal").Principal} canisterId Canister ID of Agent
  * @param {{agentOptions?: import("@dfinity/agent").HttpAgentOptions; actorOptions?: import("@dfinity/agent").ActorConfig}} [options]
- * @return {import("@dfinity/agent").ActorSubclass<import("./mysite_assets.did.js")._SERVICE>}
+ * @return {import("@dfinity/agent").ActorSubclass<import("./microblog_assets.did.js")._SERVICE>}
  */
  export const createActor = (canisterId, options) => {
   const agent = new HttpAgent({ ...options?.agentOptions });
@@ -32,7 +32,7 @@ export const canisterId = process.env.MYSITE_ASSETS_CANISTER_ID;
 };
   
 /**
- * A ready-to-use agent for the mysite_assets canister
- * @type {import("@dfinity/agent").ActorSubclass<import("./mysite_assets.did.js")._SERVICE>}
+ * A ready-to-use agent for the microblog_assets canister
+ * @type {import("@dfinity/agent").ActorSubclass<import("./microblog_assets.did.js")._SERVICE>}
  */
- export const mysite_assets = createActor(canisterId);
+ export const microblog_assets = createActor(canisterId);

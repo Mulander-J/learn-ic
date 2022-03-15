@@ -1,8 +1,21 @@
 {
   "canisters": {
-    "Microblog": {
-      "main": "src/mysite/Microblog.mo",
+    "microblog": {
+      "main": "src/microblog/Microblog.mo",
       "type": "motoko"
+    },
+    "microblog_assets": {
+      "dependencies": [
+        "microblog"
+      ],
+      "frontend": {
+        "entrypoint": "src/microblog_assets/src/index.html"
+      },
+      "source": [
+        "src/microblog_assets/assets",
+        "dist/microblog_assets/"
+      ],
+      "type": "assets"
     }
   },
   "defaults": {
