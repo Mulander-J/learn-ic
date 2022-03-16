@@ -1,8 +1,8 @@
 {
-  "Microblog": {
-    "ic": "7qjyx-4aaaa-aaaal-qan3q-cai"
+  "microblog": {
+    "ic": "ba3yw-7aaaa-aaaal-qaqqa-cai"
   },
-  "myCounter": {},
-  "mysite": {},
-  "mysite_assets": {}
+  "microblog_assets": {
+    "ic": "bh26c-syaaa-aaaal-qaqqq-cai"
+  }
 }

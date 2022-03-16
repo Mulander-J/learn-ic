@@ -8,12 +8,12 @@ type Result =
 type MessageWithAuthor = 
  record {
    author: Author;
-   content: text;
+   "text": text;
    time: Time;
  };
 type Message = 
  record {
-   content: text;
+   "text": text;
    time: Time;
  };
 type Author = 
@@ -28,12 +28,12 @@ service : {
   followBy: (principal) -> (Result);
   followBys: () -> (vec Author);
   follows: () -> (vec Author);
-  getName: () -> (text) query;
   getRemoteName: (principal) -> (text);
   getRemotePosts: (principal, Time) -> (vec Message);
   getRemotePostsWithAuthor: (principal, Time) -> (vec MessageWithAuthor);
+  get_name: () -> (text) query;
   post: (text) -> (Result);
-  posts: (Time) -> (vec MessageWithAuthor);
+  posts: (Time) -> (vec MessageWithAuthor) query;
   setUser: (UserInfo) -> (UserInfo);
   timeline: (Time) -> (vec MessageWithAuthor);
 }

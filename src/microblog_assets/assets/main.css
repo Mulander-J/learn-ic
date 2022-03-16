@@ -1,37 +1,286 @@
-body {
-    font-family: sans-serif;
-    font-size: 1.5rem;
+@font-face {
+    font-family: 'Sunnyspell';
+    src: local('Sunnyspell'), url('./fonts/SunnyspellsRegular.otf') format('truetype');
+    font-weight: normal;
 }
 
-img {
-    max-width: 50vw;
-    max-height: 25vw;
-    display: block;
-    margin: auto;
+*{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;    
+    text-decoration: none;
+    transition: all .3s;
 }
 
-form {
-    display: flex;
+body{
+    background-image: linear-gradient( 135deg, #5EFCE8 10%, #736EFE 100%);
+    background-repeat: no-repeat;
+    min-height: 100vh;
+    --primary: #07508D;
+    --second: #3986C6;
+    --accent: #5F97C6;
+    --highlight: #DA7E00;
+    --text:#000;
+}
+
+ul,li,ol{
+    list-style: none;
+}
+
+h1,h2,h3,h4,h5,h6{
+    font-family: Sunnyspell, sans-serif;
+    letter-spacing: 3px;
+    color: var(--primary);
+}
+
+a{
+    color:#5F97C6;
+    opacity: .8;
+}
+a:hover{
+    color: #3986C6;
+    opacity: 1;
+}
+
+.btn{
+    user-select: none;
+    cursor: pointer;
+    padding: .4rem .6rem;
+    margin: 0 1rem;
+    border-radius: 15px;
+    display: inline-flex;
     justify-content: center;
-    gap: 0.5em;
-    flex-flow: row wrap;
-    max-width: 40vw;
-    margin: auto;
-    align-items: baseline;
+    align-items: center;
+    font-size: 1rem;
+    font-weight: 600;
+    text-transform: capitalize;
+    background: var(--primary);
+    color: #fff;
+}
+.btn.deactive{
+    background: var(--accent);
+}
+.btn:hover{
+    background: var(--second);
 }
 
-button[type="submit"] {
-    padding: 5px 20px;
-    margin: 10px auto;
-    float: right;
+#app{
+    width: 80vw;
+    margin: 0 auto;
+    color: var(--text);
 }
 
-#greeting {
-    margin: 10px auto;
-    padding: 10px 60px;
-    border: 1px solid #222;
+header{
+    color: var(--primary);
+    width: 100%;
+    padding: 2rem 0;
+    text-align: center;
+    font-family: Sunnyspell, sans-serif;
+    font-size: 3rem;
+    letter-spacing: 3px;
 }
 
-#greeting:empty {
-    display: none;
+main{
+    position: relative;
+    width: 100%;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: flex-start;
+}
+
+/* Profile Card */
+.card {
+    width: 100%;
+    box-shadow: 0 10px 90px #00000024;    
+    text-align: center;    
+    font-size: 20px;    
+    border-radius: 15px;
+}
+.card .card-header {    
+    position: relative;    
+    height: 48px;
+}
+.card .card-header .profile-img {    
+    width: 130px;    
+    height: 130px;    
+    border-radius: 1000px;   
+    position: absolute;    
+    left: 50%;   
+    transform: translate(-50%, -50%);
+    border: 8px solid var(--second);
+    background: rgba(0,0,0,.8);
+    box-shadow: 0 0 20px #00000033;
+}
+.card .card-header .profile-img:hover {    
+    transform: translate(-50%, -50%) scale(1.2);
+    border-color: var(--accent);
+}
+.card .card-body {   
+    padding: 10px;
+    display: flex;
+    flex-flow: column;
+    justify-content: center;
+    align-items: center;
+}
+.card .card-body .name {
+    margin-top: 30px;
+    font-family: Sunnyspell, sans-serif;
+    font-size: 22px; 
+    color: var(--primary);
+    letter-spacing: 3px;
+}
+.card .card-body .mail {
+    margin-top: .8rem;
+    font-size: 16px;
+}
+.card .card-footer{
+    padding: .5rem .8rem 1rem;
+    font-size: 14px;
+    color: var(--second);
+}
+.card .card-footer strong{
+    color: var(--highlight);
+}
+
+/* follow who */
+.followWho{
+    margin: 1rem 0;
+    padding: .8rem;
+}
+.publish input,
+.followWho input{
+    outline: none;
+    padding: 6px 12px;
+    border: 2px solid;
+    border-color: var(--second);
+    border-radius: 15px;
+    color: var(--primary);
+}
+.publish ::placeholder,
+.followWho ::placeholder{
+    color: var(--accent);
+}
+.publish input:hover,
+.publish input:focus,
+.followWho input:hover,
+.followWho input:focus{
+    border-color: var(--primary);
+}
+.followWho .btn{
+    margin-top: 1rem;
+    background: var(--highlight);
+}
+
+/* authors */
+.authors{
+    padding: .8rem;
+    color: var(--primary);
+}
+.authors .follow-tabs{
+    margin: .8rem 0;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    font-size: 1rem;
+}
+.authors ul{
+    margin: 1rem 0;
+}
+.authors li{
+    border-radius: 15px;
+    border-left: 1px solid;
+    border-right: 1px solid;
+    text-align: left;
+    padding: .8rem 1rem;
+    font-size: 1rem;
+    cursor: pointer;
+    color: #7175fc;
+    margin: 1rem 0;
+}
+.authors li label{
+    color: var(--primary);
+    font-weight: 500;
+}
+.authors li p{
+    color: var(--second);
+    font-size: .8rem;
+}
+.authors li:hover{
+    background: var(--second);
+}
+.authors li:hover p,
+.authors li:hover label{
+    color: #fff;
+}
+
+
+.left{
+    margin-right: 10px;
+    max-width: 250px;
+}
+
+.right{
+    flex-grow: 1;
+}
+.right .network{
+    position: absolute;
+    right: 5%;
+    top: 5%;
+    padding: .4rem .6rem;
+    display: inline-flex;
+    align-items: center;
+    width: max-content;
+    user-select: none;
+    color: var(--primary);
+}
+.right .network img{
+    margin-left: 1rem;
+    height: 40px;
+    width: 40px;
+}
+.right .publish{
+    margin-bottom: 1rem;
+    padding: .8rem;
+    display: flex;
+    align-items: center;
+}
+.right .publish .btn{
+    background: var(--highlight);
+}
+.right .posts{
+    position: relative;
+    min-height: 400px;
+    height: 100%;
+    text-align: left;
+    padding: 1.2rem;
+}
+.right .posts h3 strong{
+    color: var(--second);
+}
+.right .posts .post-tabs{
+    margin: 1rem 0;
+}
+.right .posts .post-card{
+    margin: 1rem 0;
+    text-align: left;
+    padding: .8rem 2rem;
+}
+.right .posts .post-card strong{
+    color: var(--primary);
+    font-size: 1.2rem;
+}
+.right .posts .post-card section{
+   color: #000;
+   font-size: 1rem;
+   margin: .8rem 0;
+}
+.right .posts .post-card section span{
+    color: var(--second);
+    font-size: 1.6rem;
+    font-family: Sunnyspell, sans-serif;
+    letter-spacing: 3px;
+ }
+.right .posts .post-card label{
+    color: var(--accent);
+    font-size: .8rem;
 }

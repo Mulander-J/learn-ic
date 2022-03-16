@@ -20,18 +20,18 @@ actor Microblog{
   };
 
   public type Message = {
-    content: Text;
+    text: Text;
     time: Time.Time;
   };
 
   public type MessageWithAuthor = {
-    content: Text;
+    text: Text;
     time: Time.Time;
     author: Author;
   };
 
   public type InterfaceMicroblog = actor {
-    getName: shared () -> async Text;
+    get_name: shared () -> async Text;
     posts: shared (Time.Time) -> async [MessageWithAuthor];
     followBy: shared (Principal) -> async Result.Result<Bool, Text>;
   };
@@ -58,7 +58,7 @@ actor Microblog{
   public shared func getRemoteName(pid: Principal) : async Text {
     try{
       let canister : InterfaceMicroblog = actor(Principal.toText(pid));
-      let name = await canister.getName();
+      let name = await canister.get_name();
 
       if(Text.size(name) > 0){
         return name;
@@ -100,7 +100,7 @@ actor Microblog{
 
     Array.map<Message, MessageWithAuthor>(_msgs, func (e){
       return {
-        content = e.content;
+        text = e.text;
         time = e.time;
         author = {
           id = pid;
@@ -114,7 +114,7 @@ actor Microblog{
 
   /*  query methods  */
 
-  public shared query func getName() : async Text {
+  public shared query func get_name() : async Text {
     if(Text.size(_user.name) > 0){      
       _user.name;
     }else{
@@ -129,7 +129,7 @@ actor Microblog{
     await authorMatch(List.toArray(_followedBy));
   };
 
-  public shared func posts(sience: Time.Time) : async [MessageWithAuthor] {
+  public shared query func posts(sience: Time.Time) : async [MessageWithAuthor] {
     var list: List.List<Message> = List.nil();
 
     switch (sience) {
@@ -141,11 +141,11 @@ actor Microblog{
       };
     };
 
-    let _name = await getName();
+    let _name = _user.name;
 
     List.toArray(List.map<Message, MessageWithAuthor>(list, func (e){
       return {
-        content = e.content;
+        text = e.text;
         time = e.time;
         author = {
           id = Principal.fromActor(Microblog);
@@ -168,7 +168,7 @@ actor Microblog{
         for(_m in Iter.fromArray(_msgs)){
           if(sience <= _m.time){
               _all := List.push<MessageWithAuthor>({
-                content = _m.content;
+                text = _m.text;
                 time = _m.time;
                 author = {
                   id = pid;
@@ -205,7 +205,7 @@ actor Microblog{
     };
 
     let _m : Message = {
-      content = message;
+      text = message;
       time = Time.now();
     };
 

@@ -1,24 +1,84 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
-    <title>Microblog</title>
-    <base href="/" />
-    <link rel="icon" href="favicon.ico" />
-    <link type="text/css" rel="stylesheet" href="main.css" />
-  </head>
-  <body>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width" />
+  <title>Microblog</title>
+  <base href="/" />
+  <link rel="icon" href="favicon.ico" />
+  <link type="text/css" rel="stylesheet" href="main.css" />
+  <script src="https://unpkg.com/vue@3"></script>
+</head>
+
+<body>
+  <div id="app">
+    <header>{{ localName }} 's Microblog</header>
     <main>
-      <h1>Hello World!</h1>
-      <h2>Build By @Mulander</h2>
-      <img src="logo.png" alt="DFINITY logo" />
-      <form action="#">
-        <label for="name">Enter your name: &nbsp;</label>
-        <input id="name" alt="Name" type="text" />
-        <button type="submit">Click Me!</button>
-      </form>
-      <section id="greeting"></section>
-    </main>
-  </body>
+      <!-- Left.My Blog -->
+      <div class="left">
+        <!-- Profile Card -->
+        <div class="card">
+          <div class="card-header"> 
+            <img src="img/infinity_logo.svg" alt="Profile Image" class="profile-img">
+          </div>
+          <div class="card-body">
+            <p class="name">@{{ localName }}</p> <a href="#" class="mail">mulander_j@outlook.com</a>
+          </div>
+          <div class="card-footer">
+            <strong>{{ num_following }}</strong> Following | <strong>{{ num_follower }}</strong> Followers
+          </div>
+        </div>
+        <!-- Follow Who -->
+        <div class="followWho card">
+          <input type="text" placeholder="PrincipalId">
+          <div class="btn" @click="addFollow">Follow</div>
+        </div>
+        <!-- User List -->
+        <div class="authors card">
+          <h3>Blogers</h3>
+          <div class="follow-tabs">
+            <div class="btn" :class="{'deactive':userTab === 'follower'}" @click="userTab = 'following'">Following</div>
+            <div class="btn" :class="{'deactive':userTab === 'following'}" @click="userTab = 'follower'">Follower</div>
+          </div>
+          <ul v-if="user_list.length>0" key="list">
+            <li v-for="(author, i) in user_list" :key="i" @click="skipTab(2,author)">
+              <label>@{{ author.name }}</label>
+              <p>{{ author.id }}</p>
+            </li>           
+          </ul>
+          <div v-else key="empty">No Data</div>
+        </div>
+      </div>
+      <!-- Right.Followed Blog -->
+      <div class="right">
+        <div class="publish card">
+          <input type="text" placeholder="Content">
+          <div class="btn" @click="addPost">Post</div>
+        </div>
+        <div class="posts card">
+          <div v-show="loadings.length>0" class="network card">
+            Loading({{ loadings.length }})
+            <img src="/img/loading.svg" alt="">
+          </div>
+          <h3>Foucs Timeline / <strong>{{breadTab}}</strong></h3>
+          <div class="post-tabs">
+            <div v-show="msgTab<2" class="btn" :class="{'deactive':msgTab !== 0 }" @click="skipTab(0)">My Posts</div>
+            <div v-show="msgTab<2" class="btn" :class="{'deactive':msgTab !== 1 }" @click="skipTab(1)">Follow's Posts</div>
+            <div v-show="msgTab===2" class="btn" @click="skipTab(0)">Back</div>
+          </div>
+          <div class="content" v-if="focusLine.length>0">
+            <div class="post-card card" v-for="(post,i) in focusLine">
+              <strong>@{{msgTab===2 ? remoteUser.name : localName}}</strong>
+              <section><span>Said:</span> {{post.text}}</section>
+              <label>{{post.time}}</label>
+            </div>
+          </div>
+          <div v-else key="empty">No Data</div>
+        </div>
+      </div>
+    </main>    
+  </div>
+</body>
+
 </html>

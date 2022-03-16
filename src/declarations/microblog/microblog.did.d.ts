@@ -1,8 +1,8 @@
 import type { Principal } from '@dfinity/principal';
 export interface Author { 'id' : Principal, 'user' : UserInfo }
-export interface Message { 'content' : string, 'time' : Time }
+export interface Message { 'text' : string, 'time' : Time }
 export interface MessageWithAuthor {
-  'content' : string,
+  'text' : string,
   'time' : Time,
   'author' : Author,
 }
@@ -17,12 +17,12 @@ export interface _SERVICE {
   'followBy' : (arg_0: Principal) => Promise<Result>,
   'followBys' : () => Promise<Array<Author>>,
   'follows' : () => Promise<Array<Author>>,
-  'getName' : () => Promise<string>,
   'getRemoteName' : (arg_0: Principal) => Promise<string>,
   'getRemotePosts' : (arg_0: Principal, arg_1: Time) => Promise<Array<Message>>,
   'getRemotePostsWithAuthor' : (arg_0: Principal, arg_1: Time) => Promise<
       Array<MessageWithAuthor>
     >,
+  'get_name' : () => Promise<string>,
   'post' : (arg_0: string) => Promise<Result>,
   'posts' : (arg_0: Time) => Promise<Array<MessageWithAuthor>>,
   'setUser' : (arg_0: UserInfo) => Promise<UserInfo>,

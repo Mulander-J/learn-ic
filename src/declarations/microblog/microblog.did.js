@@ -3,9 +3,9 @@ export const idlFactory = ({ IDL }) => {
   const Author = IDL.Record({ 'id' : IDL.Principal, 'user' : UserInfo });
   const Result = IDL.Variant({ 'ok' : IDL.Bool, 'err' : IDL.Text });
   const Time = IDL.Int;
-  const Message = IDL.Record({ 'content' : IDL.Text, 'time' : Time });
+  const Message = IDL.Record({ 'text' : IDL.Text, 'time' : Time });
   const MessageWithAuthor = IDL.Record({
-    'content' : IDL.Text,
+    'text' : IDL.Text,
     'time' : Time,
     'author' : Author,
   });
@@ -16,7 +16,6 @@ export const idlFactory = ({ IDL }) => {
     'followBy' : IDL.Func([IDL.Principal], [Result], []),
     'followBys' : IDL.Func([], [IDL.Vec(Author)], []),
     'follows' : IDL.Func([], [IDL.Vec(Author)], []),
-    'getName' : IDL.Func([], [IDL.Text], ['query']),
     'getRemoteName' : IDL.Func([IDL.Principal], [IDL.Text], []),
     'getRemotePosts' : IDL.Func([IDL.Principal, Time], [IDL.Vec(Message)], []),
     'getRemotePostsWithAuthor' : IDL.Func(
@@ -24,8 +23,9 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Vec(MessageWithAuthor)],
         [],
       ),
+    'get_name' : IDL.Func([], [IDL.Text], ['query']),
     'post' : IDL.Func([IDL.Text], [Result], []),
-    'posts' : IDL.Func([Time], [IDL.Vec(MessageWithAuthor)], []),
+    'posts' : IDL.Func([Time], [IDL.Vec(MessageWithAuthor)], ['query']),
     'setUser' : IDL.Func([UserInfo], [UserInfo], []),
     'timeline' : IDL.Func([Time], [IDL.Vec(MessageWithAuthor)], []),
   });
