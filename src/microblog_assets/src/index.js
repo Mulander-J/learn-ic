@@ -107,7 +107,7 @@ Vue.createApp({
       alert('Nothing happend.')
     },
     getAuthorName(post){
-      switch (msgTab){
+      switch (this.msgTab){
         case 0:
           return this.localName
         case 1:
