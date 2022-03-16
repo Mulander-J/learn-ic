@@ -1,5 +1,6 @@
 import type { Principal } from '@dfinity/principal';
 export interface Author { 'id' : Principal, 'user' : UserInfo }
+export type List = [] | [[Principal, List]];
 export interface Message { 'text' : string, 'time' : Time }
 export interface MessageWithAuthor {
   'text' : string,
@@ -11,7 +12,7 @@ export type Result = { 'ok' : boolean } |
 export type Time = bigint;
 export interface UserInfo { 'name' : string }
 export interface _SERVICE {
-  'authorMatch' : (arg_0: Array<Principal>) => Promise<Array<Author>>,
+  'authorMatch' : (arg_0: List) => Promise<Array<Author>>,
   'emptyData' : () => Promise<bigint>,
   'follow' : (arg_0: Principal) => Promise<Result>,
   'followBy' : (arg_0: Principal) => Promise<Result>,
@@ -23,7 +24,7 @@ export interface _SERVICE {
       Array<MessageWithAuthor>
     >,
   'get_name' : () => Promise<string>,
-  'post' : (arg_0: string) => Promise<Result>,
+  'post' : (arg_0: string, arg_1: string) => Promise<Result>,
   'posts' : (arg_0: Time) => Promise<Array<MessageWithAuthor>>,
   'setUser' : (arg_0: UserInfo) => Promise<UserInfo>,
   'timeline' : (arg_0: Time) => Promise<Array<MessageWithAuthor>>,

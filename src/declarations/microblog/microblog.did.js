@@ -1,4 +1,6 @@
 export const idlFactory = ({ IDL }) => {
+  const List = IDL.Rec();
+  List.fill(IDL.Opt(IDL.Tuple(IDL.Principal, List)));
   const UserInfo = IDL.Record({ 'name' : IDL.Text });
   const Author = IDL.Record({ 'id' : IDL.Principal, 'user' : UserInfo });
   const Result = IDL.Variant({ 'ok' : IDL.Bool, 'err' : IDL.Text });
@@ -10,7 +12,7 @@ export const idlFactory = ({ IDL }) => {
     'author' : Author,
   });
   return IDL.Service({
-    'authorMatch' : IDL.Func([IDL.Vec(IDL.Principal)], [IDL.Vec(Author)], []),
+    'authorMatch' : IDL.Func([List], [IDL.Vec(Author)], []),
     'emptyData' : IDL.Func([], [IDL.Int], []),
     'follow' : IDL.Func([IDL.Principal], [Result], []),
     'followBy' : IDL.Func([IDL.Principal], [Result], []),
@@ -24,7 +26,7 @@ export const idlFactory = ({ IDL }) => {
         [],
       ),
     'get_name' : IDL.Func([], [IDL.Text], ['query']),
-    'post' : IDL.Func([IDL.Text], [Result], []),
+    'post' : IDL.Func([IDL.Text, IDL.Text], [Result], []),
     'posts' : IDL.Func([Time], [IDL.Vec(MessageWithAuthor)], ['query']),
     'setUser' : IDL.Func([UserInfo], [UserInfo], []),
     'timeline' : IDL.Func([Time], [IDL.Vec(MessageWithAuthor)], []),

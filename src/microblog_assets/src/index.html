@@ -53,7 +53,8 @@
       <!-- Right.Followed Blog -->
       <div class="right">
         <div class="publish card">
-          <input type="text" placeholder="Content">
+          <input type="text" placeholder="Content" v-model="postVal">
+          <input type="text" placeholder="Secret" v-model="postSecret">
           <div class="btn" @click="addPost">Post</div>
         </div>
         <div class="posts card">

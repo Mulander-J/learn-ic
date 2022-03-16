@@ -16,13 +16,18 @@ type Message =
    "text": text;
    time: Time;
  };
+type List = 
+ opt record {
+       principal;
+       List;
+     };
 type Author = 
  record {
    id: principal;
    user: UserInfo;
  };
 service : {
-  authorMatch: (vec principal) -> (vec Author);
+  authorMatch: (List) -> (vec Author);
   emptyData: () -> (int);
   follow: (principal) -> (Result);
   followBy: (principal) -> (Result);
@@ -32,7 +37,7 @@ service : {
   getRemotePosts: (principal, Time) -> (vec Message);
   getRemotePostsWithAuthor: (principal, Time) -> (vec MessageWithAuthor);
   get_name: () -> (text) query;
-  post: (text) -> (Result);
+  post: (text, text) -> (Result);
   posts: (Time) -> (vec MessageWithAuthor) query;
   setUser: (UserInfo) -> (UserInfo);
   timeline: (Time) -> (vec MessageWithAuthor);

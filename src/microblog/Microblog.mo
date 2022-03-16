@@ -31,7 +31,7 @@ actor Microblog{
   };
 
   public type InterfaceMicroblog = actor {
-    get_name: shared () -> async Text;
+    get_name: shared query () -> async Text;
     posts: shared (Time.Time) -> async [MessageWithAuthor];
     followBy: shared (Principal) -> async Result.Result<Bool, Text>;
   };
@@ -70,10 +70,10 @@ actor Microblog{
     };
   };
 
-  public shared func authorMatch(pids: [Principal]): async [Author] {
+  public shared func authorMatch(pids: List.List<Principal>): async [Author] {
     var _res : List.List<Author> = List.nil();
 
-    for(pid in Iter.fromArray(pids)){
+    for(pid in Iter.fromList(pids)){
       _res := List.push<Author>({
         id = pid;
         user = {
@@ -123,10 +123,10 @@ actor Microblog{
   };
 
   public shared func follows() : async [Author] {
-    await authorMatch(List.toArray(_following));
+    await authorMatch(_following);
   };
   public shared func followBys() : async [Author] {
-    await authorMatch(List.toArray(_followedBy));
+    await authorMatch(_followedBy);
   };
 
   public shared query func posts(sience: Time.Time) : async [MessageWithAuthor] {
@@ -197,21 +197,22 @@ actor Microblog{
     _user;
   };
 
-  public shared(msg) func post(message: Text) : async Result.Result<Bool, Text> {
-    onlyOwner(msg.caller);
+  public shared(msg) func post(message: Text, secret: Text) : async Result.Result<Bool, Text> {
+    // onlyOwner(msg.caller);
+    if(secret == "90876"){
+      if(Text.size(message) <= 0){
+        return #err("Empty Message");
+      };
 
-    if(Text.size(message) <= 0){
-      return #err("Empty Message");
-    };
+      _messages := List.push<Message>({
+        text = message;
+        time = Time.now();
+      }, _messages);
 
-    let _m : Message = {
-      text = message;
-      time = Time.now();
-    };
-
-    _messages := List.push<Message>(_m, _messages);
-
-    return #ok(true)
+      return #ok(true)
+    }else{
+      return #err("You are not owner")
+    }
   };
 
   public shared(msg) func emptyData() : async Int {

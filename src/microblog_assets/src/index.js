@@ -8,6 +8,8 @@ Vue.createApp({
   data() {
     return {
       localName: DEFAULT_NAME,
+      postVal: '',
+      postSecret: '',
       remoteUser: {
         name: DEFAULT_NAME,
         id:'',
@@ -97,7 +99,9 @@ Vue.createApp({
       this.msgTab = tab
     },
     async addPost(){
-      alert('Nothing happend.')
+      this.tryHelper(microblog.post,null,(res)=>{
+        alert(res.err || res.ok);
+      },this.postVal,this.postSecret);
     },
     async addFollow(){
       alert('Nothing happend.')
