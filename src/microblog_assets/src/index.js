@@ -106,6 +106,18 @@ Vue.createApp({
     async addFollow(){
       alert('Nothing happend.')
     },
+    getAuthorName(post){
+      switch (msgTab){
+        case 0:
+          return this.localName
+        case 1:
+          return post.author.user.name
+        case 2:
+          return this.remoteUser.name
+        case 3:
+          return DEFAULT_NAME
+      }
+    }
   },
   mounted() {
     this.tryHelper(microblog.get_name,DEFAULT_NAME,(res)=>{

@@ -31,8 +31,8 @@ actor Microblog{
   };
 
   public type InterfaceMicroblog = actor {
-    get_name: shared query () -> async Text;
-    posts: shared (Time.Time) -> async [MessageWithAuthor];
+    get_name: shared query () -> async ?Text;
+    posts: shared (Time.Time) -> async [Message];
     followBy: shared (Principal) -> async Result.Result<Bool, Text>;
   };
 
@@ -58,15 +58,14 @@ actor Microblog{
   public shared func getRemoteName(pid: Principal) : async Text {
     try{
       let canister : InterfaceMicroblog = actor(Principal.toText(pid));
-      let name = await canister.get_name();
+      let pokName : ?Text = await canister.get_name();
 
-      if(Text.size(name) > 0){
-        return name;
-      }else {
-        return defaultAuthor;
-      }
+      let name : Text = switch pokName {
+        case null defaultAuthor;
+        case (?txt) txt;
+      };
     }catch(err){
-      return defaultAuthor;
+      defaultAuthor;
     };
   };
 

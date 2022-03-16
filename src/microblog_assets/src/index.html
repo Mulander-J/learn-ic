@@ -70,7 +70,7 @@
           </div>
           <div class="content" v-if="focusLine.length>0">
             <div class="post-card card" v-for="(post,i) in focusLine">
-              <strong>@{{msgTab===2 ? remoteUser.name : localName}}</strong>
+              <strong>@{{getAuthorName(post)}}</strong>
               <section><span>Said:</span> {{post.text}}</section>
               <label>{{post.time}}</label>
             </div>
