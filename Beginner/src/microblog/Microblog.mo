@@ -197,7 +197,7 @@ actor Microblog{
   };
 
   public shared(msg) func post(message: Text, secret: Text) : async Result.Result<Bool, Text> {
-    // onlyOwner(msg.caller);
+    onlyOwner(msg.caller);
     if(secret == "90876"){
       if(Text.size(message) <= 0){
         return #err("Empty Message");
