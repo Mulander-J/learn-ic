@@ -1,13 +1,18 @@
-import TLog "./modules/TextLogger";
+import Array "mo:base/Array";
 import Logger "mo:ic-logger/Logger";
+import TLog "modules/TextLogger";
 
 actor DaddyLogger {
   let Max = 3;  
-  var logNext = -1;
-  let loggers : [var ?TLog] = Array.init(n, null);
+  var logNext = 0;
+  let loggers : [var ?TLog.TextLogger] = Array.init(1, null);
+
+  public shared query func getNext() : async Nat{
+    logNext;
+  };
 
   // dynamically install a new TextLogger    
-  private func newLog() : async TLog {
+  private func newLog() : async TLog.TextLogger {
     let tl = await TLog.TextLogger();
     logNext += 1;
     loggers[logNext] := ?tl;
@@ -21,11 +26,11 @@ actor DaddyLogger {
         await newLog(); 
       };
       case (?log) {
-        let size = await log.stats().bucket_sizes;
+        let stats = await log.stats();
+        let tol = Array.foldLeft<Nat, Nat>(stats.bucket_sizes, 0, func (b, a) { return b+a; });
+        assert(tol <= Max);
         
-        assert(size <= Max);
-        
-        if(size == Max){
+        if(tol == Max){
           await newLog();
         }else{
           log;
@@ -33,11 +38,11 @@ actor DaddyLogger {
       };
     };
 
-    await _logger.append(msgs);
+    _logger.append(msgs);
   };
 
   // Return the messages between from and to indice (inclusive).
-  public shared query func view(from: Nat, to: Nat) : async Logger.View<Text> {
+  public shared func view(from: Nat, to: Nat) : async Logger.View<Text> {
     assert(from <= to);
 
     let end = to / Max;
@@ -45,26 +50,32 @@ actor DaddyLogger {
     var _fr = from % Max;
 
     var start_index =  0;
-    var messages = [];
+    var messages: [Text] = [];
     
     if(start <= logNext){
-      label Loop loop{
+      label LOOP loop{
         if (start <= end) { 
           let _to = if(start < end){
             Max;
           }else{
-            end % Max - 1;
+            end % Max;
           };
           try{
-            let _temp = await loggers[start].view(_fr, _to);
-            messages := Array.append(messages,_temp.messages);
-            if(start_index == 0){
-              start_index := _temp.start_index;
+            switch(loggers[start]){
+              case null {};
+              case (?log){
+                let _temp = await log.view(_fr, _to);
+                messages := Array.append<Text>(messages,_temp.messages);
+                if(start_index == 0){
+                  start_index := _temp.start_index;
+                };
+              };
             };
-          }catch{};
+          }
+          catch(err){};
 
           _fr := 0;
-          start++;
+          start += 1;
         }else{
           break LOOP;
         };
@@ -76,4 +87,4 @@ actor DaddyLogger {
       messages = messages;
     };
   };
-}
+};
