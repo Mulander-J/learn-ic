@@ -1,7 +1,8 @@
 import Array "mo:base/Array";
 import Buffer "mo:base/Buffer";
-import Nat "mo:base/Nat";
+
 import Logger "mo:ic-logger/Logger";
+
 import TLog "modules/TextLogger";
 
 actor DaddyLogger {
