@@ -1,40 +1,43 @@
 import Array "mo:base/Array";
+import Buffer "mo:base/Buffer";
+import Nat "mo:base/Nat";
 import Logger "mo:ic-logger/Logger";
 import TLog "modules/TextLogger";
 
 actor DaddyLogger {
   let Max = 3;  
   var logNext = 0;
-  let loggers : [var ?TLog.TextLogger] = Array.init(1, null);
+  let loggers = Buffer.Buffer<TLog.TextLogger>(1);
 
-  public shared query func getNext() : async Nat{
+  public shared query func getNext() : async Int{
     logNext;
   };
 
   // dynamically install a new TextLogger    
   private func newLog() : async TLog.TextLogger {
     let tl = await TLog.TextLogger();
-    logNext += 1;
-    loggers[logNext] := ?tl;
+    loggers.add(tl);
     tl;
   };
 
   // Add a set of messages to the log.
   public func append(msgs: [Text]) {
-    let _logger = switch (loggers[logNext]) {
-      case null { 
-        await newLog(); 
-      };
+    let _logger = switch (loggers.getOpt(logNext)) {
       case (?log) {
         let stats = await log.stats();
         let tol = Array.foldLeft<Nat, Nat>(stats.bucket_sizes, 0, func (b, a) { return b+a; });
+        
         assert(tol <= Max);
         
         if(tol == Max){
+          logNext += 1;
           await newLog();
         }else{
           log;
         };
+      };
+      case Null { 
+        await newLog(); 
       };
     };
 
@@ -49,7 +52,6 @@ actor DaddyLogger {
     var start = from / Max;
     var _fr = from % Max;
 
-    var start_index =  0;
     var messages: [Text] = [];
     
     if(start <= logNext){
@@ -58,18 +60,15 @@ actor DaddyLogger {
           let _to = if(start < end){
             Max;
           }else{
-            end % Max;
+            to % Max;
           };
           try{
-            switch(loggers[start]){
-              case null {};
+            switch(loggers.getOpt(start)){
               case (?log){
                 let _temp = await log.view(_fr, _to);
                 messages := Array.append<Text>(messages,_temp.messages);
-                if(start_index == 0){
-                  start_index := _temp.start_index;
-                };
               };
+              case Null {};
             };
           }
           catch(err){};
@@ -83,7 +82,7 @@ actor DaddyLogger {
     };
 
     return {
-      start_index = start_index;
+      start_index = from;
       messages = messages;
     };
   };
