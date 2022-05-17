@@ -23,26 +23,36 @@ actor DaddyLogger {
 
   // Add a set of messages to the log.
   public func append(msgs: [Text]) {
-    let _logger = switch (loggers.getOpt(logNext)) {
-      case (?log) {
-        let stats = await log.stats();
-        let tol = Array.foldLeft<Nat, Nat>(stats.bucket_sizes, 0, func (b, a) { return b+a; });
-        
-        assert(tol <= Max);
-        
-        if(tol == Max){
-          logNext += 1;
-          await newLog();
-        }else{
-          log;
+    let n = msgs.size();
+    var i = 0;
+    label ALOOP loop{
+      if (i < n) {
+        let _logger = switch (loggers.getOpt(logNext)) {
+          case (?log) {
+            let stats = await log.stats();
+            let tol = Array.foldLeft<Nat, Nat>(stats.bucket_sizes, 0, func (b, a) { return b+a; });
+            
+            assert(tol <= Max);
+            
+            if(tol == Max){
+              logNext += 1;
+              await newLog();
+            }else{
+              log;
+            };
+          };
+          case Null { 
+            await newLog(); 
+          };
         };
-      };
-      case Null { 
-        await newLog(); 
-      };
-    };
 
-    _logger.append(msgs);
+        _logger.append([msgs[i]]);
+
+        i += 1;
+      }else{
+        break ALOOP;
+      }
+    };
   };
 
   // Return the messages between from and to indice (inclusive).
