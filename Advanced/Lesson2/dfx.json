@@ -1,0 +1,18 @@
+{
+  "canisters": {
+    "sample":{
+      "main": "sample.mo",
+      "type": "motoko"
+    },
+    "CW": {
+      "main": "main.mo",
+      "type": "motoko"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  }
+}
