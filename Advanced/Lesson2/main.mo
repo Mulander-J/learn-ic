@@ -1,13 +1,18 @@
 import Principal "mo:base/Principal";
+import Array "mo:base/Array";
 import IC "./ic";
 
-actor class() = self {
+actor class(_mem:[Text]) = self {
   let _ic : IC.Self = actor("aaaaa-aa");
+
+  let _members = Array.map<Text>(_mem, func(m){Principal.fromText(m);});
+
+  let _controllers = Array.append<Principal>(_members, [Principal.fromActor(self)]);
 
   public func create_canister () :async IC.canister_id {
     let settings = {
       freezing_threshold = null;
-      controllers = ?[Principal.fromActor(self)];
+      controllers = ?_controllers;
       memory_allocation = null;
       compute_allocation = null;
     };
