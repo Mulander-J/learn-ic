@@ -1,11 +1,7 @@
 {
   "canisters": {
-    "sample":{
-      "main": "sample.mo",
-      "type": "motoko"
-    },
-    "CW": {
-      "main": "main.mo",
+    "MWCM": {
+      "main": "src/main.mo",
       "type": "motoko"
     }
   },
