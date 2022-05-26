@@ -82,16 +82,85 @@ actor class (g: [Principal], pn: Nat) = self {
         return proposal.approvers.size() >= pn
       };
       case _ {
-        switch (_canisterMap.get(Option.unwrap(proposal.canister_id))){
-          case (?canister){
-            if(canister.auth){
-              return proposal.approvers.size() >= pn
-            }else{
-              return true
+        switch(proposal.canister_id){
+          case (?id) {
+            switch (_canisterMap.get(id)){ 
+              case (?canister){
+                if(canister.auth){
+                  return proposal.approvers.size() >= pn
+                }else{
+                  return true
+                };
+              };
+              case null { return false; };
             };
           };
-          case null { return false; };
+          case null {
+            return false;
+          }
+        };        
+      };
+    };
+  };
+  private func handleCanister(p: Proposal) : async Result.Result<Text, Text> {
+    let _ic : IC.Self = actor("aaaaa-aa");
+    switch (p.canister_id) {
+      case (?canister_id) {
+        switch (p.pType) {
+          case (#auth) {
+            switch(_canisterMap.get(canister_id)){
+              case(?canister){
+                _canisterMap.put(canister_id, {
+                  cid = canister_id;
+                  auth = not canister.auth;
+                });
+                _proposeMap.put(p.id, settleVote(p));
+                return #ok("AUTH TRIGGER");
+              };
+              case null {
+                return #err("CANISTER NOt FOUND");
+              };
+            };
+          };
+          case (#install) {
+            switch (p.wasm_code){
+              case (?wasm_code){
+                await _ic.install_code({
+                  arg = [];
+                  wasm_module = Blob.toArray(wasm_code);
+                  mode = #install;
+                  canister_id;           
+                });
+                _proposeMap.put(p.id, settleVote(p));
+                return #ok("CANISTER INSTALL") 
+              };
+              case null {
+                return #err("LOST WASM_CODE") 
+              };
+            };
+          };
+          case (#start) {
+            await _ic.start_canister({ canister_id });
+            _proposeMap.put(p.id, settleVote(p));
+            return #ok("CANISTER START")   
+          };
+          case (#stop) {
+            await _ic.stop_canister({ canister_id });
+            _proposeMap.put(p.id, settleVote(p));
+            return #ok("CANISTER STOP")   
+          };
+          case (#delete) {
+            await _ic.delete_canister({ canister_id });
+            _proposeMap.put(p.id, settleVote(p));
+            return #ok("CANISTER DELETE")  
+          };
+          case _ {
+            return #ok("NOTHING HAPPEN");
+          };
         };
+      };
+      case null {
+        return #err("LOST CANISTER_ID");
       };
     };
   };
@@ -139,23 +208,14 @@ actor class (g: [Principal], pn: Nat) = self {
     //  check params
     if (pType != #create) {
       switch(canister_id){
-        case(?id){
-          if(not existCanister(id)){
-            return #err("CANSITER IS NOT FOUND")
-          };
-        };
-        case _ {
-          return #err("LOST CANISTER")
-        };
+        case(?id){ if (not existCanister(id)) { return #err("CANSITER IS NOT FOUND") }; };
+        case null { return #err("LOST CANISTER") };
       };
-
-      if (pType == #install and Option.isNull(wasm_code)) {
-        return #err("LOST WASM_CODE")
-      };
+      if (pType == #install and Option.isNull(wasm_code)) { return #err("LOST WASM_CODE") };
     };
-
+    //  get nextId
     let id = Nat.toText(_nextId);
-
+    //  add propose
     _proposeMap.put(id, {
       id;
       proposer = caller;
@@ -165,9 +225,9 @@ actor class (g: [Principal], pn: Nat) = self {
       approvers = [];
       settled = false;
     });
-
+    //  increment nextId
     _nextId += 1;
-
+    //  success
     #ok(id);
   };
   public shared({ caller }) func vote (id: ProposalId, chosen: Bool) : async Result.Result<Text,Text> {
@@ -187,62 +247,22 @@ actor class (g: [Principal], pn: Nat) = self {
           return #ok(if(chosen){"Vote Added"}else{"Vote Revoked"})
         };
         // meet threashhold
-        let _ic : IC.Self = actor("aaaaa-aa");
-        let canister_id = Option.unwrap(proposal.canister_id);
-        switch(proposal.pType){          
-          case (#auth){
-            switch(_canisterMap.get(canister_id)){
-              case(?canister){
-                _canisterMap.put(canister_id, {
-                  cid = canister_id;
-                  auth = not canister.auth;
-                });
-                return #ok("AUTH TRIGGER");
-              };
-              case null {
-                return #err("CANISTER NOt FOUND");
-              };
-            };
+        if (proposal.pType == #create) {
+          let settings = {
+            freezing_threshold = null;
+            controllers = ?[Principal.fromActor(self)];
+            memory_allocation = null;
+            compute_allocation = null;
           };
-          case (#create){
-            let settings = {
-              freezing_threshold = null;
-              controllers = ?[Principal.fromActor(self)];
-              memory_allocation = null;
-              compute_allocation = null;
-            };
-            let result = await _ic.create_canister({ settings = ?settings;});
-            let cid = result.canister_id;
-            _canisterMap.put(cid, { cid; auth = true; });
-            _proposeMap.put(id, settleVote(proposal));
-            return #ok("CANISTER CREATE" #Principal.toText(cid))   
-          };          
-          case (#delete) {
-            await _ic.delete_canister({ canister_id });
-            _proposeMap.put(id, settleVote(proposal));
-            return #ok("CANISTER DELETE")   
-          };  
-          case (#install) {
-            await _ic.install_code({
-              arg = [];
-              wasm_module = Blob.toArray(Option.unwrap(proposal.wasm_code));
-              mode = #install;
-              canister_id;           
-            });
-            _proposeMap.put(id, settleVote(proposal));
-            return #ok("CANISTER INSTALL")   
-          };
-          case (#start) {
-            await _ic.start_canister({ canister_id });
-            _proposeMap.put(id, settleVote(proposal));
-            return #ok("CANISTER START")   
-          };
-          case (#stop) {
-            await _ic.stop_canister({ canister_id });
-            _proposeMap.put(id, settleVote(proposal));
-            return #ok("CANISTER STOP")   
-          };                                                   
-        };        
+          let _ic : IC.Self = actor("aaaaa-aa");
+          let result = await _ic.create_canister({ settings = ?settings;});
+          let cid = result.canister_id;
+          _canisterMap.put(cid, { cid; auth = true; });
+          _proposeMap.put(id, settleVote(proposal));
+          return #ok("CANISTER CREATE" #Principal.toText(cid))  
+        } else {
+          await handleCanister(proposal);  
+        };
       };
       case null{
         return #err("PROPOSAL NOT FOUND")
