@@ -1,4 +1,8 @@
 #!/usr/bin/ic-repl
+
+// unused & dont run
+
+
 // assume we already installed the greet canister
 
 // change to id1
