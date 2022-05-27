@@ -1,71 +1,43 @@
-#!/usr/bin/ic-repl
-// assume we already installed the greet canister
+#!/bin/bash
 
-// change to id1
-identity default "./resources/identity/id1.pem";
+# Local Deploy
+_cmdHead="dfx canister call MWCM"
 
-// import the default canister, need: dfx start --clean
-import canister = "rrkah-fqaaa-aaaaa-aaaaq-cai";
+echo "===>RUN WAY="$1
 
-// setup three Principals, multi-sig model is 2 / 3 
-call canister.init(vec {principal "cnh44-cjhoh-yyoqz-tcp2t-yto7n-6vlpk-xw52p-zuo43-rrlge-4ozr5-6ae"; principal "ndb4h-h6tuq-2iudh-j3opo-trbbe-vljdk-7bxgi-t5eyp-744ga-6eqv6-2ae"; principal "lzf3n-nlh22-cyptu-56v52-klerd-chdxu-t62na-viscs-oqr2d-kyl44-rqe"}, 2);
-
-//---------------CREATE CANISTER---------------//
-
-// propose to create a canister by id1
-call canister.propose(variant {createCanister}, null, null);
-let proposal_id1 = _.id;
-
-// approve the above proposal by id1
-call canister.approve(proposal_id1);
-
-// change to id2
-identity default "./id2.pem";
-
-// approve this proposal by id2, and execute the creating canister
-call canister.approve(proposal_id1);
-
-let canister_id = _.canister_id?;
-
-//---------------INSTALL CODE---------------//
-
-// change to id1
-identity default "./id1.pem";
-
-// propose to install code into above canister by id1
-call canister.propose(variant {installCode}, opt canister_id, opt file "hello.wasm");
-let proposal_id2 = _.id;
-
-// approve the above proposal by id1
-call canister.approve(proposal_id2);
-
-// change to id2
-identity default "./id2.pem";
-
-// approve the above proposal by id2, and execute the installing code
-call canister.approve(proposal_id2);
-
-//---------------START CANISTER---------------//
-
-// change to id1
-identity default "./id1.pem";
-
-// propose to start the canister by id1
-call canister.propose(variant {startCanister}, opt canister_id, null);
-let proposal_id3 = _.id;
-
-// approve the above proposal by id1
-call canister.approve(proposal_id3);
-
-// change to id2
-identity default "./id2.pem";
-
-// approve the above proposal by id2, and execute the starting canister
-call canister.approve(proposal_id3);
-
-//---------------CALL CANISTER---------------//
-
-// call the installed canister
-call canister_id.greet("world");
-
-assert _ == "Hello, world!";
+if [ $1 == "deploy" ]
+then
+  echo "===>Deploy"
+  echo "===>Deployer Principal:" $(dfx identity get-principal)
+  dfx deploy --argument='(vec {principal "cnh44-cjhoh-yyoqz-tcp2t-yto7n-6vlpk-xw52p-zuo43-rrlge-4ozr5-6ae"; principal "ndb4h-h6tuq-2iudh-j3opo-trbbe-vljdk-7bxgi-t5eyp-744ga-6eqv6-2ae"; principal "lzf3n-nlh22-cyptu-56v52-klerd-chdxu-t62na-viscs-oqr2d-kyl44-rqe"}, 2)'
+elif [ $1 == "fetch" ]
+then
+  echo "===>Fetch Groups"
+  $_cmdHead groups
+  echo "===>Fetch passNum"
+  $_cmdHead passNum
+  echo "===>Fetch proposes"
+  $_cmdHead proposes
+  echo "===>Fetch canisters"
+  $_cmdHead canisters
+elif [ $1 == "propose" ]
+then
+  echo "===>Add proposal"
+  $_cmdHead propose '(variant {create}, null, null)'
+  echo "===>Fetch proposes"
+  $_cmdHead proposes
+elif [ $1 == "vote" ]
+then
+  if [ $3 == 0 ]
+  then
+    echo "===>Vote No"
+    $_cmdHead vote '("'$2'", false)'
+    $_cmdHead proposes
+  else
+    echo "===>Vote Yes"
+    $_cmdHead vote '("'$2'", true)'
+    $_cmdHead proposes
+  fi
+else
+   echo "NOTHING HAPPEN"
+fi

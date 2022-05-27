@@ -1,5 +1,6 @@
 import Array "mo:base/Array";
 import Blob "mo:base/Blob";
+import Cycles "mo:base/ExperimentalCycles";
 import HashMap "mo:base/HashMap";
 import Iter "mo:base/Iter";
 import Nat "mo:base/Nat";
@@ -64,6 +65,15 @@ actor class (g: [Principal], pn: Nat) = self {
   };
   public query func getProposes(id: ProposalId): async ?Proposal {
     _proposeMap.get(id)
+  };
+
+  /*  Cycle  */
+  
+  public query func getCycles() : async Nat {
+    Cycles.balance();
+  };
+  public func acceptCycles() : async Nat {
+    return Cycles.accept(Cycles.available());
   };
 
   /*  hooks */
@@ -261,7 +271,7 @@ actor class (g: [Principal], pn: Nat) = self {
           _proposeMap.put(id, settleVote(proposal));
           return #ok("CANISTER CREATE" #Principal.toText(cid))  
         } else {
-          await handleCanister(proposal);  
+          await handleCanister(newProposal);  
         };
       };
       case null{
