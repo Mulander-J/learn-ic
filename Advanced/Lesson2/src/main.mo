@@ -83,7 +83,7 @@ actor class (g : [Principal], pn : Nat) = self {
     // if(g.size() <= 0) { return false; };
     // Option.isSome(Array.find<Member>(g, func (a) : Bool { Principal.equal(a, member)}))
   };
-  private func existCanister(canister_id : Principal) : Bool {
+  private func _existCanister(canister_id : Principal) : Bool {
     Option.isSome(_canisterMap.get(canister_id));
   };
   private func checkThreashhold(proposal : Proposal) : Bool {
@@ -131,6 +131,7 @@ actor class (g : [Principal], pn : Nat) = self {
           case (#install) {
             switch (p.wasm_code) {
               case (?wasm_code) {
+                // Cycles.add(Cycles.available());
                 await _ic.install_code({
                   arg = [];
                   wasm_module = Blob.toArray(wasm_code);
@@ -208,7 +209,7 @@ actor class (g : [Principal], pn : Nat) = self {
     //  check params
     if (pType != #create) {
       switch (canister_id) {
-        case (?id) { if (not existCanister(id)) { return #err("CANSITER IS NOT FOUND") }; };
+        case (?id) { if (not _existCanister(id)) { return #err("CANSITER IS NOT FOUND") }; };
         case null { return #err("LOST CANISTER"); };
       };
       if (pType == #install and Option.isNull(wasm_code)) { return #err("LOST WASM_CODE"); };
@@ -241,10 +242,10 @@ actor class (g : [Principal], pn : Nat) = self {
         //  update vote
         let newProposal = updateVote(caller, proposal, chosen);
         _proposeMap.put(id, newProposal);
-        // check threashhold
+        //  check threashhold
         let _next = checkThreashhold(newProposal);
         if(not _next){ return #ok(if(chosen){"Vote Added"}else{"Vote Revoked"}); };
-        // meet threashhold
+        //  meet threashhold
         if (proposal.pType == #create) {
           let settings = {
             freezing_threshold = null;
@@ -253,12 +254,13 @@ actor class (g : [Principal], pn : Nat) = self {
             compute_allocation = null;
           };
           let _ic : IC.Self = actor("aaaaa-aa");
+          // Cycles.add(Cycles.available());
           let result = await _ic.create_canister({ settings = ?settings;});
           let cid = result.canister_id;
           _canisterMap.put(cid, { cid; auth = true; });
           _proposeMap.put(id, settleVote(proposal));
           return #ok("CANISTER CREATE" #Principal.toText(cid))  
-        } else {
+        } else {          
           await handleCanister(newProposal);  
         };
       };

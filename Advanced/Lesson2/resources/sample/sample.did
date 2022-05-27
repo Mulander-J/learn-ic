@@ -1,0 +1,4 @@
+service : {
+  getCycles: () -> (nat) query;
+  greet: () -> (text) query;
+}
