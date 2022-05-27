@@ -13,7 +13,7 @@ import IC "./modules/ic";
 /**
 * Multi-Wallet Canister Manager
 */
-actor class (g: [Principal], pn: Nat) = self {
+actor class (g : [Principal], pn : Nat) = self {
   /*  globle type */
 
   public type Member = Principal;
@@ -27,17 +27,17 @@ actor class (g: [Principal], pn: Nat) = self {
     #stop;
   };
   public type Proposal = {
-    id: ProposalId;
-    proposer: Member;
+    id : ProposalId;
+    proposer : Member;
     pType: ProposalType;
-    canister_id: ?Principal;
-		wasm_code:  ?Blob;
-    approvers: [Member];
-    settled: Bool;
+    canister_id : ?Principal;
+		wasm_code :  ?Blob;
+    approvers : [Member];
+    settled : Bool;
   };
   public type AuthCanister = {
-    cid: Principal;
-    auth: Bool;
+    cid : Principal;
+    auth : Bool;
   };
 
   /*  Vars  */
@@ -46,24 +46,24 @@ actor class (g: [Principal], pn: Nat) = self {
   private stable var _canisterEntries : [(Principal, AuthCanister)] = [];
   private var _canisterMap = HashMap.fromIter<Principal, AuthCanister>(_canisterEntries.vals(), 10, Principal.equal, Principal.hash);
   //  all proposals
-  private stable var _nextId: Nat = 1;
+  private stable var _nextId : Nat = 1;
   private stable var _proposeEntries : [(ProposalId, Proposal)] = [];
   private var _proposeMap = HashMap.fromIter<ProposalId, Proposal>(_proposeEntries.vals(), 10, Text.equal, Text.hash);
 
   /*  getter  */
 
-  public query func passNum(): async Nat { pn; };
-  public query func groups(): async [Member] { g; };
-  public query func canisters(): async [AuthCanister] {
+  public query func passNum() : async Nat { pn; };
+  public query func groups() : async [Member] { g; };
+  public query func canisters() : async [AuthCanister] {
     Iter.toArray(_canisterMap.vals());
   };
-  public query func proposes(): async [Proposal] {
+  public query func proposes() : async [Proposal] {
     Iter.toArray(_proposeMap.vals());
   };
-  public query func getAuthCanister(id: Principal): async ?AuthCanister {
+  public query func getAuthCanister(id : Principal): async ?AuthCanister {
     _canisterMap.get(id)
   };
-  public query func getProposes(id: ProposalId): async ?Proposal {
+  public query func getProposes(id : ProposalId): async ?Proposal {
     _proposeMap.get(id)
   };
 
@@ -86,40 +86,38 @@ actor class (g: [Principal], pn: Nat) = self {
   private func existCanister(canister_id : Principal) : Bool {
     Option.isSome(_canisterMap.get(canister_id));
   };
-  private func checkThreashhold(proposal: Proposal, pType: ProposalType) : Bool {
-    switch (pType){
+  private func checkThreashhold(proposal : Proposal) : Bool {
+    switch (proposal.pType) {
       case (#create) {
         return proposal.approvers.size() >= pn
       };
       case _ {
-        switch(proposal.canister_id){
+        switch (proposal.canister_id) {
           case (?id) {
-            switch (_canisterMap.get(id)){ 
-              case (?canister){
-                if(canister.auth){
+            switch (_canisterMap.get(id)) { 
+              case (?canister) {
+                if (canister.auth) {
                   return proposal.approvers.size() >= pn
                 }else{
                   return true
                 };
               };
-              case null { return false; };
+              case null { return false };
             };
           };
-          case null {
-            return false;
-          }
+          case null { return false };
         };        
       };
     };
   };
-  private func handleCanister(p: Proposal) : async Result.Result<Text, Text> {
+  private func handleCanister(p : Proposal) : async Result.Result<Text, Text> {
     let _ic : IC.Self = actor("aaaaa-aa");
     switch (p.canister_id) {
       case (?canister_id) {
         switch (p.pType) {
           case (#auth) {
-            switch(_canisterMap.get(canister_id)){
-              case(?canister){
+            switch (_canisterMap.get(canister_id)) {
+              case (?canister) {
                 _canisterMap.put(canister_id, {
                   cid = canister_id;
                   auth = not canister.auth;
@@ -127,14 +125,12 @@ actor class (g: [Principal], pn: Nat) = self {
                 _proposeMap.put(p.id, settleVote(p));
                 return #ok("AUTH TRIGGER");
               };
-              case null {
-                return #err("CANISTER NOt FOUND");
-              };
+              case null { return #err("CANISTER NOt FOUND"); };
             };
           };
           case (#install) {
-            switch (p.wasm_code){
-              case (?wasm_code){
+            switch (p.wasm_code) {
+              case (?wasm_code) {
                 await _ic.install_code({
                   arg = [];
                   wasm_module = Blob.toArray(wasm_code);
@@ -144,9 +140,7 @@ actor class (g: [Principal], pn: Nat) = self {
                 _proposeMap.put(p.id, settleVote(p));
                 return #ok("CANISTER INSTALL") 
               };
-              case null {
-                return #err("LOST WASM_CODE") 
-              };
+              case null { return #err("LOST WASM_CODE"); };
             };
           };
           case (#start) {
@@ -164,14 +158,10 @@ actor class (g: [Principal], pn: Nat) = self {
             _proposeMap.put(p.id, settleVote(p));
             return #ok("CANISTER DELETE")  
           };
-          case _ {
-            return #ok("NOTHING HAPPEN");
-          };
+          case _ { return #ok("NOTHING HAPPEN"); };
         };
       };
-      case null {
-        return #err("LOST CANISTER_ID");
-      };
+      case null { return #err("LOST CANISTER_ID"); };
     };
   };
   private func updateVote(m : Member, p : Proposal, b : Bool) : Proposal {
@@ -192,7 +182,7 @@ actor class (g: [Principal], pn: Nat) = self {
           //  new vote
           Array.append<Member>(p.approvers, [m]);
         };
-      } else{
+      } else {
         //  revoke vote 
         Array.filter<Member>(p.approvers, func(a) {not Principal.equal(a,m)});
       };
@@ -217,11 +207,11 @@ actor class (g: [Principal], pn: Nat) = self {
     assert(_isMember(caller));
     //  check params
     if (pType != #create) {
-      switch(canister_id){
-        case(?id){ if (not existCanister(id)) { return #err("CANSITER IS NOT FOUND") }; };
-        case null { return #err("LOST CANISTER") };
+      switch (canister_id) {
+        case (?id) { if (not existCanister(id)) { return #err("CANSITER IS NOT FOUND") }; };
+        case null { return #err("LOST CANISTER"); };
       };
-      if (pType == #install and Option.isNull(wasm_code)) { return #err("LOST WASM_CODE") };
+      if (pType == #install and Option.isNull(wasm_code)) { return #err("LOST WASM_CODE"); };
     };
     //  get nextId
     let id = Nat.toText(_nextId);
@@ -240,22 +230,20 @@ actor class (g: [Principal], pn: Nat) = self {
     //  success
     #ok(id);
   };
-  public shared({ caller }) func vote (id: ProposalId, chosen: Bool) : async Result.Result<Text,Text> {
+  public shared({ caller }) func vote (id : ProposalId, chosen : Bool) : async Result.Result<Text, Text> {
     //  check auth
     assert(_isMember(caller));
     //  update vote after find the proposal
-    switch(_proposeMap.get(id)){
-      case(?proposal){
+    switch (_proposeMap.get(id)) {
+      case (?proposal) {
         //  check settled
-        if (proposal.settled) { return #ok("PROPOSAL IS SETTLED") };
+        if (proposal.settled) { return #ok("PROPOSAL IS SETTLED"); };
         //  update vote
         let newProposal = updateVote(caller, proposal, chosen);
         _proposeMap.put(id, newProposal);
         // check threashhold
-        let _next = checkThreashhold(newProposal, proposal.pType);
-        if(not _next){
-          return #ok(if(chosen){"Vote Added"}else{"Vote Revoked"})
-        };
+        let _next = checkThreashhold(newProposal);
+        if(not _next){ return #ok(if(chosen){"Vote Added"}else{"Vote Revoked"}); };
         // meet threashhold
         if (proposal.pType == #create) {
           let settings = {
@@ -274,9 +262,7 @@ actor class (g: [Principal], pn: Nat) = self {
           await handleCanister(newProposal);  
         };
       };
-      case null{
-        return #err("PROPOSAL NOT FOUND")
-      };
+      case null{ return #err("PROPOSAL NOT FOUND"); };
     };    
   };
 
