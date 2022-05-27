@@ -24,6 +24,7 @@ elif [ $1 == "propose" ]
 then
   echo "===>Add proposal"
   $_cmdHead propose '(variant {create}, null, null)'
+  # $_cmdHead propose '(variant {auth}, opt principal "r7inp-6aaaa-aaaaa-aaabq-cai", null)'
   echo "===>Fetch proposes"
   $_cmdHead proposes
 elif [ $1 == "vote" ]
