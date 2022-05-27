@@ -131,7 +131,6 @@ actor class (g : [Principal], pn : Nat) = self {
           case (#install) {
             switch (p.wasm_code) {
               case (?wasm_code) {
-                // Cycles.add(Cycles.available());
                 await _ic.install_code({
                   arg = [];
                   wasm_module = Blob.toArray(wasm_code);
@@ -254,7 +253,7 @@ actor class (g : [Principal], pn : Nat) = self {
             compute_allocation = null;
           };
           let _ic : IC.Self = actor("aaaaa-aa");
-          // Cycles.add(Cycles.available());
+          // Cycles.add(400000000000);
           let result = await _ic.create_canister({ settings = ?settings;});
           let cid = result.canister_id;
           _canisterMap.put(cid, { cid; auth = true; });
