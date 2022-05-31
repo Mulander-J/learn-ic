@@ -1,0 +1,48 @@
+@import "./tailwind.css";
+
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+.App{
+    height: 100vh;
+}
+.app-brand{
+    @apply inline-flex items-center cursor-pointer;
+}
+.app-connect{
+    @apply px-4 inline-flex items-center;
+}
+.app-footer{
+    @apply text-center p-2;
+}
+.auth-section {
+    @apply flex justify-end text-right p-4;
+}
+
+.fade-enter {
+    opacity: 0;
+    transform: translate(0, 25px);
+    z-index: 1;
+}
+.fade-enter.fade-enter-active {
+    opacity: 1;
+    transform: translate(0, 0);
+
+    transition: opacity 250ms ease-out, transform 300ms ease;
+}
+.fade-exit {
+    opacity: 1;
+    transform: translate(0, 0);
+}
+.fade-exit.fade-exit-active {
+    opacity: 0;
+    transform: translate(0, 30px);
+
+    transition: opacity 250ms ease-out, transform 300ms ease;
+}
+  

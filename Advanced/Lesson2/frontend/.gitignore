@@ -1,0 +1,15 @@
+.DS_Store
+
+node_modules
+yarn.lock
+package-lock.json
+pnpm-lock.yaml
+
+dist
+dist-ssr
+
+*.local
+.dfx
+
+.env
+.env*.local
