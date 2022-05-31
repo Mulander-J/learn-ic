@@ -10,6 +10,7 @@ body {
 }
 .App{
     height: 100vh;
+    overflow: hidden;
 }
 .app-brand{
     @apply inline-flex items-center cursor-pointer;
@@ -26,7 +27,7 @@ body {
 
 .fade-enter {
     opacity: 0;
-    transform: translate(0, 25px);
+    transform: translate(25px, 0);
     z-index: 1;
 }
 .fade-enter.fade-enter-active {
@@ -41,7 +42,7 @@ body {
 }
 .fade-exit.fade-exit-active {
     opacity: 0;
-    transform: translate(0, 30px);
+    transform: translate(30px, 0);
 
     transition: opacity 250ms ease-out, transform 300ms ease;
 }

@@ -16,7 +16,7 @@ function UserAvatar(props: any){
   return (
     <Stack spacing={6}>
       <Avatar src={avatarSrc} alt="@multiavatar" circle />
-      { principal && <p className="font-bold">{strSlice(principal)}</p> }
+      { principal && <p className="font-bold cursor-default">{strSlice(principal)}</p> }
       <div className="mr-2 cursor-pointer" onClick={()=>{!isCopied && setCopied()}}>
         { isCopied
           ? <CopySuccess size="32" color="#37d67a" variant="TwoTone"/> 

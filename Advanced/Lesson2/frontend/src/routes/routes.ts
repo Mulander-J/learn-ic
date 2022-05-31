@@ -38,3 +38,5 @@ export const menus: routeMenu [] = [
     }
   },
 ]
+
+export const findMenu = (name:string):routeMenu|any => menus.find(e=>e.name===name)
