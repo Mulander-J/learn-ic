@@ -1,3 +1,4 @@
+@import "./font.css";
 @import "./tailwind.css";
 
 body {
@@ -7,6 +8,9 @@ body {
     sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+}
+.font-phattype{
+    font-family: Phattype, sans-serif;
 }
 .App{
     height: 100vh;
