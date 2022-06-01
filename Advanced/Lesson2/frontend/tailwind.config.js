@@ -1,6 +1,7 @@
 module.exports = {
   purge: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   darkMode: false, // or 'media' or 'class'
+  theme: {},
   // theme: {
   //   extend: {
   //     colors: {
@@ -13,10 +14,10 @@ module.exports = {
   //     },
   //   },
   // },
-  variants: {
-    extend: {
-      animation: ["motion-safe"],
-    },
-  },
-  plugins: [],
+  // variants: {
+  //   extend: {
+  //     animation: ["motion-safe"],
+  //   },
+  // },
+  plugins: []
 }

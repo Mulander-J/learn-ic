@@ -3,21 +3,19 @@ import { Container, Header, Content, Footer } from 'rsuite'
 import { ConnectDialog } from "@connect2ic/react"
 import AppNav from '@/components/AppNav'
 import Routers from '@/routes/index'
-
-const twitter = 'MulanderKilig'
+import { AUTHOR_TWITTER } from '@/utils/constant'
 
 function App() {
-
   return (
     <Container className="App">
       <Header>
         <AppNav />
       </Header>
-      <Content>
+      <Content className="overflow-auto">
         <Routers />
       </Content>
       <Footer className="app-footer">
-        <span>by <a target="_blank" href={`https://twitter.com/${twitter}`}>@{twitter}</a></span>
+        <span>by <a target="_blank" href={`https://twitter.com/${AUTHOR_TWITTER}`}>@{AUTHOR_TWITTER}</a></span>
       </Footer>
       <ConnectDialog dark />
     </Container>

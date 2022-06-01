@@ -4,20 +4,21 @@ import { Copy, CopySuccess } from 'iconsax-react'
 import { Avatar, Stack } from 'rsuite'
 import { strSlice } from '@/utils'
 
+// const avararBase = 'https://api.multiavatar.com/'
+const avararBase = ''
+
 function UserAvatar(props: any){
-  const { principal } = props
+  const { principal, hideAvatar = false } = props
 
   if(!principal) return null
 
   const _text = principal?._isPrincipal ? principal.toString() : principal
 
-  const [isCopied, setCopied] = useClipboard(_text, { successDuration: 1000 })
-  const avatarSrc = ''
-  // const avatarSrc = `https://api.multiavatar.com/${principal}.svg`
+  const [isCopied, setCopied] = useClipboard(_text, { successDuration: 1000 })  
 
   return (
     <Stack spacing={6}>
-      <Avatar src={avatarSrc} alt="@multiavatar" circle />
+      { !hideAvatar && <Avatar src={`${avararBase}${_text}.svg`} alt="@multiavatar" circle /> }
       { _text && <p className="font-bold cursor-default">{strSlice(_text)}</p> }
       <div className="mr-2 cursor-pointer" onClick={()=>{!isCopied && setCopied()}}>
         { isCopied

@@ -37,6 +37,13 @@ export const menus: routeMenu [] = [
       title:'Canister'
     }
   },
+  { 
+    path:'/propose',
+    name: 'propose',
+    meta: {
+      title:'Propose'
+    }
+  },
 ]
 
 export const findMenu = (name:string):routeMenu|any => menus.find(e=>e.name===name)

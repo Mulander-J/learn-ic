@@ -57,8 +57,12 @@ actor class (g : [Principal], pn : Nat) = self {
   public query func canisters() : async [AuthCanister] {
     Iter.toArray(_canisterMap.vals());
   };
-  public query func proposes() : async [Proposal] {
-    Iter.toArray(_proposeMap.vals());
+  public query func proposes() : async ([Proposal], Nat, Nat) {
+    (
+      Iter.toArray(_proposeMap.vals()),
+      g.size(),
+      pn
+    )
   };
   public query func getAuthCanister(id : Principal): async ?AuthCanister {
     _canisterMap.get(id)

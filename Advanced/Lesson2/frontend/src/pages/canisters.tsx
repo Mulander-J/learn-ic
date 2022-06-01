@@ -1,32 +1,33 @@
-import React, { useEffect, useState, useCallback } from "react"
+import React, { useEffect, useMemo } from "react"
+import useFetch from "@/hooks/useFetch"
 import { useCanister } from "@connect2ic/react"
-import { wait } from '@/utils'
+import { Lock1 } from 'iconsax-react'
+import { FlexboxGrid } from 'rsuite'
 import UserAvatar from "@/components/UserAvatar"
-import EmptyBlock from "@/components/EmptyBlock"
+import LinkBtn from "@/components/LinkBtn"
+import HolderBlock from "@/components/HolderBlock"
 
 export default function PageCanisters() {
-  const [isFetching, setFetch] = useState(false)
-  const [pn, setPN] = useState(0)
-  const [list, setList] = useState<any>([])
   const [MWCM] = useCanister("MWCM", { mode: "anonymous" })
-  
-  const getData = useCallback(async()=>{
-    if(isFetching || !MWCM) return
-    setFetch(true)
-    try{
-      const _l: any = await MWCM.groups()
-      const _pn: any = await MWCM.passNum()
-      console.log('[group_res]',[ _pn,_l])
-      await wait(1200)
-      setPN((_pn || 0).toString())
-      setList(_l?.length > 0 ? _l : [])
-    }catch{
-      setList([])
-      setPN(0)
-    }finally{
-      setFetch(false)
-    }
-  },[isFetching, MWCM])
+  const { res, isFetching, getData } = useFetch(MWCM, ['canisters'])
+
+  const renderList = useMemo(()=>{
+    if(isFetching) return <HolderBlock/>
+    if(res?.length<=0) return 'No Data Yet'
+    const [ list=[] ] = res
+    return (
+      <div>
+        <LinkBtn name="proposal">Goto propose</LinkBtn>
+        <div className="grid gap-y-4 text-center mt-8">
+          {
+            (list?.length||0)<=0 
+            ? 'No Data Yet' 
+            : list.map((l:any, i: number)=><CanisterCard key={i} item={l}/>)
+          }
+        </div>
+      </div>
+    )
+  },[res,isFetching])
 
   useEffect(()=>{
     getData()
@@ -35,18 +36,28 @@ export default function PageCanisters() {
   return (
     <div className="page-wrapper page-center">
       <h2 className="app-title1">Canister</h2>
-      <p>Become a uptown member and participate in multi-signature governance</p>
-      <p className="my-2">
-        <label>PassNum: </label>
-        <span className="text-green-400">{pn}/{list.length}</span>
-      </p>      
-      <div className="grid gap-y-4">
-        {
-          isFetching
-          ? <EmptyBlock/>
-          : list.map((l:any, i: number)=><UserAvatar key={i} principal={l} />)
-        }
-      </div>
+      <p className="mb-4">Canister maintained by members</p>    
+      {renderList}
     </div>
+  )
+}
+
+const CanisterCard = (props:any)=>{
+  const { item } = props
+  return (
+    <FlexboxGrid align="top" justify="center">
+      <FlexboxGrid.Item>
+        <label>Canister</label>
+        <UserAvatar principal={item?.cid} hideAvatar />
+      </FlexboxGrid.Item>
+      <FlexboxGrid.Item className="mx-4">
+        <label>SHA256</label>
+        <p>{item?.codeSHA || '--'}</p>
+      </FlexboxGrid.Item>
+      <FlexboxGrid.Item>
+        <label>Require Multi-Sign</label>
+        {item?.auth ? <Lock1 className="my-2 mx-auto" size="20" color="#f47373" variant="TwoTone"/> : 'Open'}
+      </FlexboxGrid.Item>
+    </FlexboxGrid>
   )
 }

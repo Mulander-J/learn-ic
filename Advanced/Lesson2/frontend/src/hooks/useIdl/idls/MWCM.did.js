@@ -37,7 +37,7 @@ export const idlFactory = ({ IDL }) => {
         [Result],
         [],
       ),
-    'proposes' : IDL.Func([], [IDL.Vec(Proposal)], ['query']),
+    'proposes' : IDL.Func([], [IDL.Vec(Proposal), IDL.Nat, IDL.Nat], ['query']),
     'vote' : IDL.Func([ProposalId, IDL.Bool], [Result], []),
   });
   return anon_class_16_1;

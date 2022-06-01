@@ -1,32 +1,34 @@
-import React, { useEffect, useState, useCallback } from "react"
+import React, { useEffect, useMemo } from "react"
+import useFetch from "@/hooks/useFetch"
 import { useCanister } from "@connect2ic/react"
-import { wait } from '@/utils'
 import UserAvatar from "@/components/UserAvatar"
-import EmptyBlock from "@/components/EmptyBlock"
+import LinkBtn from "@/components/LinkBtn"
+import HolderBlock from "@/components/HolderBlock"
 
 export default function PageGroups() {
-  const [isFetching, setFetch] = useState(false)
-  const [pn, setPN] = useState(0)
-  const [list, setList] = useState<any>([])
   const [MWCM] = useCanister("MWCM", { mode: "anonymous" })
-  
-  const getData = useCallback(async()=>{
-    if(isFetching || !MWCM) return
-    setFetch(true)
-    try{
-      const _l: any = await MWCM.groups()
-      const _pn: any = await MWCM.passNum()
-      console.log('[group_res]',[ _pn,_l])
-      await wait(1200)
-      setPN((_pn || 0).toString())
-      setList(_l?.length > 0 ? _l : [])
-    }catch{
-      setList([])
-      setPN(0)
-    }finally{
-      setFetch(false)
-    }
-  },[isFetching, MWCM])
+  const { res, isFetching, getData } = useFetch(MWCM,['groups', 'passNum'])
+  const renderList = useMemo(()=>{
+    if(isFetching) return <HolderBlock/>
+    if(res?.length<=0) return 'No Data Yet'
+    const [ list=[], pn = 0 ] = res
+    return (
+      <div>
+        <LinkBtn name="proposal">Goto propose</LinkBtn>
+        <p className="my-2">
+          <label>PassNum: </label>
+          <span className="text-green-400">{pn.toString()}/{list?.length || 0}</span>
+        </p>           
+        <div className="grid gap-y-4 text-center">
+          {
+            (list?.length||0)<=0 
+            ? 'No Data Yet' 
+            : list.map((l:any, i: number)=><UserAvatar key={i} principal={l} />)
+          }
+        </div>
+      </div>
+    )
+  },[res,isFetching])
 
   useEffect(()=>{
     getData()
@@ -34,19 +36,9 @@ export default function PageGroups() {
 
   return (
     <div className="page-wrapper page-center">
-      <h2 className="app-title1">Canister</h2>
-      <p>Become a uptown member and participate in multi-signature governance</p>
-      <p className="my-2">
-        <label>PassNum: </label>
-        <span className="text-green-400">{pn}/{list.length}</span>
-      </p>      
-      <div className="grid gap-y-4">
-        {
-          isFetching
-          ? <EmptyBlock/>
-          : list.map((l:any, i: number)=><UserAvatar key={i} principal={l} />)
-        }
-      </div>
+      <h2 className="app-title1">Group</h2>
+      <p className="mb-4">Become a uptown member and participate in multi-signature governance</p>    
+      {renderList}
     </div>
   )
 }

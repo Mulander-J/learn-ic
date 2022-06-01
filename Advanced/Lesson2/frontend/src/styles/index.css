@@ -34,6 +34,12 @@ body {
 .auth-section {
     @apply flex justify-end text-right p-4;
 }
+.app-btn {
+    @apply bg-purple-500 hover:bg-purple-600 leading-5 text-center w-40 mx-auto my-4 px-5 py-2 text-sm rounded-full font-semibold text-white cursor-pointer select-none;
+}
+.app-IconBtn{
+    @apply mx-2 cursor-pointer select-none;
+}
 /*  page-layout */
 .page-wrapper {
     @apply p-4;
@@ -44,7 +50,7 @@ body {
 /* transtion-fade */
 .fade-enter {
     opacity: 0;
-    transform: translate(25px, 0);
+    transform: translate(0, 25px);
     z-index: 1;
 }
 .fade-enter.fade-enter-active {
@@ -59,8 +65,46 @@ body {
 }
 .fade-exit.fade-exit-active {
     opacity: 0;
-    transform: translate(30px, 0);
+    transform: translate(0, 30px);
 
     transition: opacity 250ms ease-out, transform 300ms ease;
+}
+
+/* proposeItem */
+.p-settled,
+.p-item{
+    @apply relative rounded-lg py-4 px-6;
+    transition: all .28s ease-in-out;
+    background: #0f0c29;  /* fallback for old browsers */
+    background: -webkit-linear-gradient(to right, #24243e, #302b63, #0f0c29);  /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to right, #24243e, #302b63, #0f0c29); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+}
+.p-settled:hover,
+.p-item:hover {
+    transform: scale(1.1);
+}
+.p-settled::after{
+    position: absolute;
+    top: 0.3rem;
+    left: -0.5rem;
+    z-index: 1;
+    padding-right: 0.625rem;
+    font-weight: bold;
+    line-height: 0px;
+    color: #000;
+    height: 0px;
+    border: 1rem solid #ee7600;
+    border-right-color: transparent;
+    content: "Closed";
+    box-shadow: 0px 0.3125rem 0.3125rem -0.3125rem #000;
+}
+.p-settled::before{
+    content: "";
+    position: absolute;
+    top: 2.1875rem;
+    left: -0.5rem;
+    border: 0.25rem solid #89540c;
+    border-left-color: transparent;
+    border-bottom-color: transparent;
 }
   
