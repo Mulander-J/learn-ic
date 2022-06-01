@@ -1,0 +1,1 @@
+export const CID_MWCM = import.meta.env.VITE_APP_CID_MWCM as string

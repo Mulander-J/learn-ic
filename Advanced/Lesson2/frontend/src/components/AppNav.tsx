@@ -19,7 +19,7 @@ export default function AppNav () {
       </Navbar.Header>
       <Navbar.Body>
         <Nav activeKey={location?.pathname} onSelect={navigate}>
-          {menus.map(m=><Nav.Item eventKey={m.path}>{m?.meta?.title}</Nav.Item>)}
+          {menus.map(m=><Nav.Item eventKey={m.path} key={m.name}>{m?.meta?.title}</Nav.Item>)}
         </Nav>
         <Nav pullRight>
           <Nav.Item className="app-connect">

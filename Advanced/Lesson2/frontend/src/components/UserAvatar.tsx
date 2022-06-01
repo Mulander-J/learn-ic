@@ -9,14 +9,16 @@ function UserAvatar(props: any){
 
   if(!principal) return null
 
-  const [isCopied, setCopied] = useClipboard(principal, { successDuration: 1000 })
+  const _text = principal?._isPrincipal ? principal.toString() : principal
+
+  const [isCopied, setCopied] = useClipboard(_text, { successDuration: 1000 })
   const avatarSrc = ''
   // const avatarSrc = `https://api.multiavatar.com/${principal}.svg`
 
   return (
     <Stack spacing={6}>
       <Avatar src={avatarSrc} alt="@multiavatar" circle />
-      { principal && <p className="font-bold cursor-default">{strSlice(principal)}</p> }
+      { _text && <p className="font-bold cursor-default">{strSlice(_text)}</p> }
       <div className="mr-2 cursor-pointer" onClick={()=>{!isCopied && setCopied()}}>
         { isCopied
           ? <CopySuccess size="32" color="#37d67a" variant="TwoTone"/> 

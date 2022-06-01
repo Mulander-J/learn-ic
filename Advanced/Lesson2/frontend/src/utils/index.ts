@@ -5,3 +5,9 @@ export const strSlice = (str: string, front = 6, behind = 3): string => {
     behind === 0 ? '' : str.slice(-behind)
   }`
 }
+
+export const wait = (ms:number) => {
+  return new Promise((resolve) => {
+    setTimeout(() => {resolve(ms)}, ms)
+  })
+}
