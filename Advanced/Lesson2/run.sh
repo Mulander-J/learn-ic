@@ -3,6 +3,7 @@
 # Local Deploy
 _cmdHead="dfx canister call MWCM"
 # _cmdHead="dfx canister --network=ic --wallet=yz336-daaaa-aaaal-qag3a-cai call e5x6l-faaaa-aaaal-qa36q-cai"
+# _cmdHead="dfx canister --network=ic call e5x6l-faaaa-aaaal-qa36q-cai"
 echo "===>RUN WAY="$1
 
 if [ $1 == "deploy" ]
@@ -25,6 +26,7 @@ then
   echo "===>Add proposal"
   $_cmdHead propose '(variant {create}, null, null, null)'
   # $_cmdHead propose '(variant {auth}, opt principal "r7inp-6aaaa-aaaaa-aaabq-cai", null, null)'
+  # $_cmdHead propose '(variant {auth}, opt principal "dyhvq-iaaaa-aaaal-qa4ta-cai", null, null)'
   echo "===>Fetch proposes"
   $_cmdHead proposes
 elif [ $1 == "vote" ]
