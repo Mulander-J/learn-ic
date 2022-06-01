@@ -1,13 +1,23 @@
 export const idlFactory = ({ IDL }) => {
   const AuthCanister = IDL.Record({ 'cid' : IDL.Principal, 'auth' : IDL.Bool });
+  const definite_canister_settings = IDL.Record({
+    'freezing_threshold' : IDL.Nat,
+    'controllers' : IDL.Vec(IDL.Principal),
+    'memory_allocation' : IDL.Nat,
+    'compute_allocation' : IDL.Nat,
+  });
   const CanisterStats = IDL.Record({
     'status' : IDL.Variant({
       'stopped' : IDL.Null,
       'stopping' : IDL.Null,
       'running' : IDL.Null,
     }),
+    'freezing_threshold' : IDL.Nat,
+    'memory_size' : IDL.Nat,
     'cycles' : IDL.Nat,
+    'settings' : definite_canister_settings,
     'module_hash' : IDL.Opt(IDL.Vec(IDL.Nat8)),
+    'idle_cycles_burned_per_second' : IDL.Float64,
   });
   const ProposalId = IDL.Text;
   const Member = IDL.Principal;
@@ -23,6 +33,7 @@ export const idlFactory = ({ IDL }) => {
     'id' : ProposalId,
     'settled' : IDL.Bool,
     'canister_id' : IDL.Opt(IDL.Principal),
+    'wasm_sha256' : IDL.Opt(IDL.Text),
     'proposer' : Member,
     'pType' : ProposalType,
     'approvers' : IDL.Vec(Member),
@@ -43,7 +54,12 @@ export const idlFactory = ({ IDL }) => {
     'groups' : IDL.Func([], [IDL.Vec(Member)], ['query']),
     'passNum' : IDL.Func([], [IDL.Nat], ['query']),
     'propose' : IDL.Func(
-        [ProposalType, IDL.Opt(IDL.Principal), IDL.Opt(IDL.Vec(IDL.Nat8))],
+        [
+          ProposalType,
+          IDL.Opt(IDL.Principal),
+          IDL.Opt(IDL.Vec(IDL.Nat8)),
+          IDL.Opt(IDL.Text),
+        ],
         [Result],
         [],
       ),

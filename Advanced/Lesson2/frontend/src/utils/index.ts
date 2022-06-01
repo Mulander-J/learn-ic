@@ -6,6 +6,12 @@ export const strSlice = (str: string, front = 10, behind = 3): string => {
   }`
 }
 
+export const unWrap = (opt: any) => {
+  if(!opt) return null
+  if(Array.isArray(opt)) return opt?.[0] || null
+  return opt
+}
+
 export const wait = (ms:number) => {
   return new Promise((resolve) => {
     setTimeout(() => {resolve(ms)}, ms)

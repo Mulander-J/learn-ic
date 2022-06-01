@@ -32,6 +32,7 @@ actor class (g : [Principal], pn : Nat) = self {
     pType: ProposalType;
     canister_id : ?Principal;
 		wasm_code :  ?Blob;
+    wasm_sha256: ?Text;
     approvers : [Member];
     settled : Bool;
   };
@@ -41,8 +42,12 @@ actor class (g : [Principal], pn : Nat) = self {
   };
   public type CanisterStats = {
     status : { #stopped; #stopping; #running };
+    freezing_threshold : Nat;
+    memory_size : Nat;
     cycles : Nat;
+    settings : IC.definite_canister_settings;
     module_hash : ?[Nat8];
+    idle_cycles_burned_per_second : Float;
   };
   /*  Vars  */
 
@@ -77,12 +82,7 @@ actor class (g : [Principal], pn : Nat) = self {
   public func checkCanisters(canister_id : Principal) : async CanisterStats {
     assert(_existCanister(canister_id));
     let _ic : IC.Self = actor("aaaaa-aa");
-    let stats = await _ic.canister_status({canister_id});
-    return {
-      status = stats.status;
-      cycles = stats.cycles;
-      module_hash = stats.module_hash;
-    }
+    await _ic.canister_status({canister_id});
   };
 
   /*  Cycle  */
@@ -189,6 +189,7 @@ actor class (g : [Principal], pn : Nat) = self {
       proposer = p.proposer;
       canister_id = p.canister_id;
       wasm_code = p.wasm_code;
+      wasm_sha256 = p.wasm_sha256;
       settled = p.settled;
       // update approvers only
       approvers = if (b) {
@@ -213,6 +214,7 @@ actor class (g : [Principal], pn : Nat) = self {
       proposer = p.proposer;
       canister_id = p.canister_id;
       wasm_code = p.wasm_code;
+      wasm_sha256 = p.wasm_sha256;
       settled = true;
       approvers = p.approvers
     }
@@ -220,7 +222,7 @@ actor class (g : [Principal], pn : Nat) = self {
 
   /*  update  */
 
-  public shared({ caller }) func propose (pType : ProposalType, canister_id: ?Principal, wasm_code : ?Blob) : async Result.Result<Text, Text> {
+  public shared({ caller }) func propose (pType : ProposalType, canister_id: ?Principal, wasm_code : ?Blob, wasm_sha256: ?Text) : async Result.Result<Text, Text> {
     //  check auth
     assert(_isMember(caller));
     //  check params
@@ -229,7 +231,10 @@ actor class (g : [Principal], pn : Nat) = self {
         case (?id) { if (not _existCanister(id)) { return #err("CANSITER IS NOT FOUND") }; };
         case null { return #err("LOST CANISTER"); };
       };
-      if (pType == #install and Option.isNull(wasm_code)) { return #err("LOST WASM_CODE"); };
+      if (pType == #install) { 
+        if(Option.isNull(wasm_code)) { return #err("LOST WASM_CODE"); };
+        if(Option.isNull(wasm_sha256)) { return #err("LOST WASM_SHA256"); };         
+      };
     };
     //  get nextId
     let id = Nat.toText(_nextId);
@@ -240,6 +245,7 @@ actor class (g : [Principal], pn : Nat) = self {
       pType;
       canister_id;
       wasm_code;
+      wasm_sha256;
       approvers = [];
       settled = false;
     });
@@ -271,7 +277,7 @@ actor class (g : [Principal], pn : Nat) = self {
             compute_allocation = null;
           };
           let _ic : IC.Self = actor("aaaaa-aa");
-          // Cycles.add(400000000000);
+          Cycles.add(120000000000);
           let result = await _ic.create_canister({ settings = ?settings;});
           let cid = result.canister_id;
           _canisterMap.put(cid, { cid; auth = true; });

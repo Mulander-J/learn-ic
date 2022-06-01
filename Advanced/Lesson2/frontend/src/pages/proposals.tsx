@@ -3,6 +3,7 @@ import { useCanister } from "@connect2ic/react"
 import { AddSquare, Like1, LikeDislike } from 'iconsax-react'
 import { Tag, Progress, Tooltip, Whisper, Divider } from 'rsuite'
 import useFetch from "@/hooks/useFetch"
+import { unWrap, strSlice } from "@/utils"
 import LinkBtn from "@/components/LinkBtn"
 import HolderBlock from "@/components/HolderBlock"
 import UserAvatar from "@/components/UserAvatar"
@@ -63,6 +64,9 @@ const ItemCard = (props: any)=>{
   const approved = (item?.approvers?.length || 0)
   const percent = Math.round(100 * approved / (m||1))
 
+  const wasmSha256 = unWrap(item?.wasm_sha256)
+  const canister_id = unWrap(item?.canister_id)
+
   const handleVote = (vote: boolean)=>{
     console.log('vote', [item, vote])
     alert(`You clikc vote ${vote}`)
@@ -74,12 +78,23 @@ const ItemCard = (props: any)=>{
         <UserAvatar principal={item?.proposer}/>
         <div>
           <p className="text-md font-semibold text-right">Id#{item?.id}</p> 
-          <Tag color={_info.color}>{pType}</Tag>
+          <Tag color={_info.color} className="text-black font-semibold">{pType}</Tag>
         </div>
       </div>
       <p className="my-2 text-left">{_info.desc}</p>
       <Divider />
-      {item.codeSHA && <p className="my-4 text-red-400">{item.codeSHA}</p>}
+      {canister_id && (
+        <p className="my-4 text-red-400">
+          <label>CanisterId: </label>
+          <span>{strSlice(canister_id.toString())}</span>
+        </p>
+      )}
+      {wasmSha256 && (
+        <p className="my-4 text-red-400">
+          <label>WASM SHA256: </label>
+          <span>{wasmSha256}</span>
+        </p>
+      )}
       <h4 className="text-left">Votes Stats :  {approved} / {m}</h4>
       <Progress.Line percent={percent} status="active" />
       {

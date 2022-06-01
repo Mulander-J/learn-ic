@@ -47,7 +47,7 @@ function CanisterCard (props:any) {
   const { item } = props
   const [MWCM] = useCanister("MWCM")
   const [stats, setStats] = useState<any>(null)
-  const getMore = async ()=>{    
+  const getMore = async ()=>{
     try{
       const _stats = await MWCM.checkCanisters(item.cid)
       setStats(_stats)
@@ -63,10 +63,6 @@ function CanisterCard (props:any) {
         <FlexboxGrid.Item>
           <label>Canister</label>
           <UserAvatar principal={item?.cid} hideAvatar />
-        </FlexboxGrid.Item>
-        <FlexboxGrid.Item className="mx-4">
-          <label>SHA256</label>
-          <p>{item?.codeSHA || '--'}</p>
         </FlexboxGrid.Item>
         <FlexboxGrid.Item className="mx-4">
           <label>Require Multi-Sign</label>
