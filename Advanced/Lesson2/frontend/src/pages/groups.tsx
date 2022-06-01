@@ -10,7 +10,7 @@ export default function PageGroups() {
   const { res, isFetching, getData } = useFetch(MWCM,['groups', 'passNum'])
   const renderList = useMemo(()=>{
     if(isFetching) return <HolderBlock/>
-    if(res?.length<=0) return 'No Data Yet'
+    if(res?.length<=0) return 'No Data Yet'    
     const [ list=[], pn = 0 ] = res
     return (
       <div>

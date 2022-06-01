@@ -11,3 +11,10 @@ export const wait = (ms:number) => {
     setTimeout(() => {resolve(ms)}, ms)
   })
 }
+
+export const errHandle = (err: any) => {
+  console.log('[err]', err)
+  if(!err?.message) return 'Error'
+  if(err.message.includes('Code: 403')) return 'Failed to authenticate request'
+  return err.message
+}

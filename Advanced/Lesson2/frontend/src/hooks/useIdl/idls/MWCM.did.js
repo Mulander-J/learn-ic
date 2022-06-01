@@ -1,5 +1,14 @@
 export const idlFactory = ({ IDL }) => {
   const AuthCanister = IDL.Record({ 'cid' : IDL.Principal, 'auth' : IDL.Bool });
+  const CanisterStats = IDL.Record({
+    'status' : IDL.Variant({
+      'stopped' : IDL.Null,
+      'stopping' : IDL.Null,
+      'running' : IDL.Null,
+    }),
+    'cycles' : IDL.Nat,
+    'module_hash' : IDL.Opt(IDL.Vec(IDL.Nat8)),
+  });
   const ProposalId = IDL.Text;
   const Member = IDL.Principal;
   const ProposalType = IDL.Variant({
@@ -23,6 +32,7 @@ export const idlFactory = ({ IDL }) => {
   const anon_class_16_1 = IDL.Service({
     'acceptCycles' : IDL.Func([], [IDL.Nat], []),
     'canisters' : IDL.Func([], [IDL.Vec(AuthCanister)], ['query']),
+    'checkCanisters' : IDL.Func([IDL.Principal], [CanisterStats], []),
     'getAuthCanister' : IDL.Func(
         [IDL.Principal],
         [IDL.Opt(AuthCanister)],

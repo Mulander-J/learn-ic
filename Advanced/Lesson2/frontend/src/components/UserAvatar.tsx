@@ -4,8 +4,9 @@ import { Copy, CopySuccess } from 'iconsax-react'
 import { Avatar, Stack } from 'rsuite'
 import { strSlice } from '@/utils'
 
-// const avararBase = 'https://api.multiavatar.com/'
-const avararBase = ''
+const avararBase = (id:string) => {
+  return import.meta.env.VITE_APP_DFX_NETWORK === 'ic' ? `https://api.multiavatar.com/${id}.svg` : id
+}
 
 function UserAvatar(props: any){
   const { principal, hideAvatar = false } = props
@@ -18,7 +19,7 @@ function UserAvatar(props: any){
 
   return (
     <Stack spacing={6}>
-      { !hideAvatar && <Avatar src={`${avararBase}${_text}.svg`} alt="@multiavatar" circle /> }
+      { !hideAvatar && <Avatar src={avararBase(_text)} alt="@multiavatar" circle /> }
       { _text && <p className="font-bold cursor-default">{strSlice(_text)}</p> }
       <div className="mr-2 cursor-pointer" onClick={()=>{!isCopied && setCopied()}}>
         { isCopied

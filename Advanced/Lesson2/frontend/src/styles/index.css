@@ -10,11 +10,11 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 /* fonts */
-.font-phattype{
-    font-family: Phattype, sans-serif;
+.font-grouns{
+    font-family: Grouns, sans-serif;
 }
 .app-title1{
-    font-family: Phattype, sans-serif;
+    font-family: Grouns, sans-serif;
     @apply font-semibold text-2xl my-4;
 }
 /* app-layout */
@@ -39,6 +39,17 @@ body {
 }
 .app-IconBtn{
     @apply mx-2 cursor-pointer select-none;
+}
+.app-home {
+    @apply grid text-center justify-center items-center h-full w-full relative;
+}
+.app-vMask{
+    @apply absolute top-0 left-0 h-full w-full object-cover;
+    z-index: -1;
+    filter: blur(0);
+}
+.app-btn:hover +.app-vMask{
+    filter: blur(8px);
 }
 /*  page-layout */
 .page-wrapper {

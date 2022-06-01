@@ -1,8 +1,9 @@
-import React, { useEffect, useMemo } from "react"
+import React, { useEffect, useMemo, useState } from "react"
 import useFetch from "@/hooks/useFetch"
+import { errHandle } from "@/utils"
 import { useCanister } from "@connect2ic/react"
-import { Lock1 } from 'iconsax-react'
-import { FlexboxGrid } from 'rsuite'
+import { Lock1, MoreSquare } from 'iconsax-react'
+import { FlexboxGrid, Whisper, Tooltip, Message, toaster } from 'rsuite'
 import UserAvatar from "@/components/UserAvatar"
 import LinkBtn from "@/components/LinkBtn"
 import HolderBlock from "@/components/HolderBlock"
@@ -42,22 +43,60 @@ export default function PageCanisters() {
   )
 }
 
-const CanisterCard = (props:any)=>{
+function CanisterCard (props:any) {
   const { item } = props
+  const [MWCM] = useCanister("MWCM")
+  const [stats, setStats] = useState<any>(null)
+  const getMore = async ()=>{    
+    try{
+      const _stats = await MWCM.checkCanisters(item.cid)
+      setStats(_stats)
+    }catch(err:any){
+      const msg = errHandle(err)
+      toaster.push(<Message showIcon type="error">{msg}</Message>)
+      setStats(null)
+    }
+  } 
   return (
-    <FlexboxGrid align="top" justify="center">
-      <FlexboxGrid.Item>
-        <label>Canister</label>
-        <UserAvatar principal={item?.cid} hideAvatar />
-      </FlexboxGrid.Item>
-      <FlexboxGrid.Item className="mx-4">
-        <label>SHA256</label>
-        <p>{item?.codeSHA || '--'}</p>
-      </FlexboxGrid.Item>
-      <FlexboxGrid.Item>
-        <label>Require Multi-Sign</label>
-        {item?.auth ? <Lock1 className="my-2 mx-auto" size="20" color="#f47373" variant="TwoTone"/> : 'Open'}
-      </FlexboxGrid.Item>
-    </FlexboxGrid>
+    <div className="w-full">
+      <FlexboxGrid align="top" justify="center">
+        <FlexboxGrid.Item>
+          <label>Canister</label>
+          <UserAvatar principal={item?.cid} hideAvatar />
+        </FlexboxGrid.Item>
+        <FlexboxGrid.Item className="mx-4">
+          <label>SHA256</label>
+          <p>{item?.codeSHA || '--'}</p>
+        </FlexboxGrid.Item>
+        <FlexboxGrid.Item className="mx-4">
+          <label>Require Multi-Sign</label>
+          {item?.auth ? <Lock1 className="my-2 mx-auto" size="20" color="#f47373" variant="TwoTone"/> : 'Open'}
+        </FlexboxGrid.Item>
+        <FlexboxGrid.Item>
+          <label>More Info</label>
+          <Whisper speaker={<Tooltip>Check More Detail</Tooltip>}>
+            <MoreSquare onClick={getMore} className="app-IconBtn my-2" size="20" color="#FF8A65"/>
+          </Whisper>          
+        </FlexboxGrid.Item>      
+      </FlexboxGrid>
+      {
+        stats && (
+          <div>
+            <div>
+              <label>status</label>
+              <p>{stats?.status}</p>
+            </div>
+            <div>
+              <label>cycles</label>
+              <p>{stats?.cycles}</p>
+            </div>
+            <div>
+              <label>module_hash</label>
+              <p>{stats?.module_hash}</p>
+            </div>
+          </div>
+        )
+      }
+    </div>
   )
 }

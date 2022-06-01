@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from "react"
 import { useCanister } from "@connect2ic/react"
 import { AddSquare, Like1, LikeDislike } from 'iconsax-react'
-import { Tag, Progress, Tooltip, Whisper } from 'rsuite'
+import { Tag, Progress, Tooltip, Whisper, Divider } from 'rsuite'
 import useFetch from "@/hooks/useFetch"
 import LinkBtn from "@/components/LinkBtn"
 import HolderBlock from "@/components/HolderBlock"
@@ -78,6 +78,7 @@ const ItemCard = (props: any)=>{
         </div>
       </div>
       <p className="my-2 text-left">{_info.desc}</p>
+      <Divider />
       {item.codeSHA && <p className="my-4 text-red-400">{item.codeSHA}</p>}
       <h4 className="text-left">Votes Stats :  {approved} / {m}</h4>
       <Progress.Line percent={percent} status="active" />

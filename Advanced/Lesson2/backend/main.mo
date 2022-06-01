@@ -39,7 +39,11 @@ actor class (g : [Principal], pn : Nat) = self {
     cid : Principal;
     auth : Bool;
   };
-
+  public type CanisterStats = {
+    status : { #stopped; #stopping; #running };
+    cycles : Nat;
+    module_hash : ?[Nat8];
+  };
   /*  Vars  */
 
   //  all cansiters
@@ -64,11 +68,21 @@ actor class (g : [Principal], pn : Nat) = self {
       pn
     )
   };
-  public query func getAuthCanister(id : Principal): async ?AuthCanister {
+  public query func getAuthCanister(id : Principal) : async ?AuthCanister {
     _canisterMap.get(id)
   };
-  public query func getProposes(id : ProposalId): async ?Proposal {
+  public query func getProposes(id : ProposalId) : async ?Proposal {
     _proposeMap.get(id)
+  };
+  public func checkCanisters(canister_id : Principal) : async CanisterStats {
+    assert(_existCanister(canister_id));
+    let _ic : IC.Self = actor("aaaaa-aa");
+    let stats = await _ic.canister_status({canister_id});
+    return {
+      status = stats.status;
+      cycles = stats.cycles;
+      module_hash = stats.module_hash;
+    }
   };
 
   /*  Cycle  */
@@ -261,7 +275,7 @@ actor class (g : [Principal], pn : Nat) = self {
           let result = await _ic.create_canister({ settings = ?settings;});
           let cid = result.canister_id;
           _canisterMap.put(cid, { cid; auth = true; });
-          _proposeMap.put(id, settleVote(proposal));
+          _proposeMap.put(id, settleVote(newProposal));
           return #ok("CANISTER CREATE" #Principal.toText(cid))  
         } else {          
           await handleCanister(newProposal);  

@@ -9,12 +9,13 @@ export default function useFetch(actor: any, cmd: string[]) {
     setFetch(true)
     try{
       let _res:any = []
-      cmd.forEach(async (c)=>{
+      for(let c of cmd){
         const _l: any = await actor[c]()
-        console.log('[_res]',[_l])
+        // console.log('[_res]',[_l])
         _res.push(_l)
-      })
+      }
       await wait(1200)
+      console.log('res',_res)
       setRes(_res)
     }catch{
       setRes([])
