@@ -48,7 +48,17 @@ body {
     z-index: -1;
     filter: blur(0);
 }
-.app-btn:hover +.app-vMask{
+.app-home section p{
+    padding: 16px;
+    border-radius: 15px;
+    background: rgba(34,34,34,.8);
+    opacity: 0;
+    transition: all .22s ease-in-out;
+}
+.app-home .app-btn:hover +section p{
+    opacity: 1;
+}
+.app-home .app-btn:hover +section .app-vMask{
     filter: blur(8px);
 }
 /*  page-layout */
@@ -118,4 +128,54 @@ body {
     border-left-color: transparent;
     border-bottom-color: transparent;
 }
-  
+/* page propose */
+.page-propose{
+    position: relative;
+    perspective-origin: center;
+    perspective: 100px;
+    overflow: hidden;
+    height: 100%;
+}
+.propose-cover{
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    height: 100%;
+    width: 100%;
+    z-index: -1;
+    background-color: blueviolet;
+    background-image: url(https://w.wallhaven.cc/full/xl/wallhaven-xlyg9o.jpg);
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: scroll;
+    background-blend-mode: multiply;
+    animation: rush ease-in-out 10s;
+    transform-style: preserve-3d;
+    transition: all .28s ease-in-out;
+}
+
+@keyframes rush {
+    0%,100%{
+        background-blend-mode: multiply;
+        transform: translateZ(0);
+    }
+    2%{
+        background-blend-mode: luminosity;
+        background-color: paleturquoise;
+    }
+    4%{
+        background-blend-mode: hard-light;
+        background-color: rebeccapurple;
+        transform: translateZ(20px);
+    }
+    6%{
+        background-blend-mode: luminosity;
+        background-color: paleturquoise;
+    }
+    8%{
+        background-blend-mode: multiply;
+        background-color: rebeccapurple;
+        transform: translateZ(0);
+    }
+}

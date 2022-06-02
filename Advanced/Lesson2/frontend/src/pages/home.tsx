@@ -8,12 +8,14 @@ const posterUrl = 'https://cdnb.artstation.com/p/assets/images/images/032/481/17
 export default function PageHome() {
   return (
     <div className="app-home">     
-      <h1 className="text-3xl font-grouns">{APP_NAME}</h1>      
-      <p className="text-lg">Welcome to {APP_NAME}.<br/>Every menber has the right to vote for the proposal of canister's action.<br/>Come & enjoy the fun.</p>
+      <h1 className="text-3xl font-grouns">{APP_NAME}</h1>            
       <LinkBtn name="proposal">Start</LinkBtn>
-      <video className="app-vMask" autoPlay muted loop poster={posterUrl}>
-        <source src={videoUrl} />
-      </video>
+      <section>
+        <p className="text-lg">Welcome to {APP_NAME}.<br/>Every menber has the right to vote for the proposal of canister's action.<br/>Come & enjoy the fun.</p>
+        <video className="app-vMask" autoPlay muted loop poster={posterUrl}>
+          <source src={videoUrl} />
+        </video>        
+      </section>
     </div>
   )
 }
