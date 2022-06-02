@@ -18,7 +18,7 @@ function App() {
         <strong className="mx-2">by <a target="_blank" href={`https://twitter.com/${AUTHOR_TWITTER}`}>@{AUTHOR_TWITTER}</a></strong>
         <span>Just Demo. No Commercial-use.</span>
       </Footer>
-      <ConnectDialog dark />
+      <ConnectDialog dark />     
     </Container>
   )
 }

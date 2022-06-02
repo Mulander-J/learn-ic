@@ -12,8 +12,8 @@ const PagePropose = lazy(async () => import('./../pages/addPropose'))
 export default function Routers () {
   const location = useLocation()
   return (    
-    <TransitionGroup component={null}>
-      <CSSTransition key={location?.key} classNames="fade" timeout={300}>
+    <TransitionGroup>
+      <CSSTransition key={location?.key} classNames="fade" timeout={300} unmountOnExit>
         <Suspense fallback={<LoadingError />}>
           <Routes location={location}>
             <Route path="/" element={<PageHome />} />

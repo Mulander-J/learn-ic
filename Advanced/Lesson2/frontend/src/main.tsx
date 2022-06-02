@@ -4,7 +4,10 @@ import ReactDOM from "react-dom"
 import { BrowserRouter } from "react-router-dom"
 /*  connect2ic  */
 import { Connect2ICProvider } from "@connect2ic/react"
-import { InternetIdentity, AstroX, NFID } from "@connect2ic/core/providers"
+import { 
+  InternetIdentity, AstroX, NFID, 
+  // PlugWallet
+} from "@connect2ic/core/providers"
 import "@connect2ic/core/style.css"
 import { canisters } from '@/hooks/useIdl'
 /*  rsuite  */
@@ -18,7 +21,8 @@ const host = window.location.origin
 const providers = [
   InternetIdentity,
   AstroX,
-  NFID
+  NFID,
+  // PlugWallet
 ]
 
 

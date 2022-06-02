@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react"
+import React, { useEffect, useMemo, useState, useCallback } from "react"
 import useFetch from "@/hooks/useFetch"
 import { errHandle } from "@/utils"
 import { useCanister } from "@connect2ic/react"
@@ -9,13 +9,24 @@ import LinkBtn from "@/components/LinkBtn"
 import HolderBlock from "@/components/HolderBlock"
 
 export default function PageCanisters() {
-  const [MWCM] = useCanister("MWCM", { mode: "anonymous" })
+  const [MWCM] = useCanister("MWCM")
   const { res, isFetching, getData } = useFetch(MWCM, ['canisters'])
 
-  const renderList = useMemo(()=>{
-    if(isFetching) return <HolderBlock/>
-    if(res?.length<=0) return 'No Data Yet'
-    const [ list=[] ] = res
+  const handleStats = useCallback(async (cid: any) => {
+    try{
+      const _stats = await MWCM.checkCanisters(cid)
+      return _stats
+    }catch(err:any){
+      const msg = errHandle(err)
+      toaster.push(<Message showIcon type="error">{msg}</Message>)
+      return null
+    }
+  }, [ MWCM ])
+
+  const renderList = useMemo(() => {
+    if( isFetching ) return <HolderBlock/>
+    if( res?.length <= 0 ) return 'No Data Yet'
+    const [ list = [] ] = res
     return (
       <div>
         <LinkBtn name="proposal">Goto propose</LinkBtn>
@@ -23,16 +34,14 @@ export default function PageCanisters() {
           {
             (list?.length||0)<=0 
             ? 'No Data Yet' 
-            : list.map((l:any, i: number)=><CanisterCard key={i} item={l}/>)
+            : list.map((l:any, i: number) => <CanisterCard key={i} item={l} onStats={handleStats} />)
           }
         </div>
       </div>
     )
-  },[res,isFetching])
+  }, [res, isFetching])
 
-  useEffect(()=>{
-    getData()
-  }, [MWCM])
+  useEffect(() => { MWCM && getData() }, [MWCM])
 
   return (
     <div className="page-wrapper page-center">
@@ -44,18 +53,11 @@ export default function PageCanisters() {
 }
 
 function CanisterCard (props:any) {
-  const { item } = props
-  const [MWCM] = useCanister("MWCM")
+  const { item, onStats } = props
   const [stats, setStats] = useState<any>(null)
   const getMore = async ()=>{
-    try{
-      const _stats = await MWCM.checkCanisters(item.cid)
-      setStats(_stats)
-    }catch(err:any){
-      const msg = errHandle(err)
-      toaster.push(<Message showIcon type="error">{msg}</Message>)
-      setStats(null)
-    }
+    const res = await onStats(item.cid)
+    setStats(res || null)
   } 
   return (
     <div className="w-full">

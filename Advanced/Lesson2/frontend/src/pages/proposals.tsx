@@ -11,7 +11,7 @@ import { pTypeInfo } from '@/utils/constant'
 
 export default function PageProposals() {
   const { isConnected } = useConnect()
-  const [ MWCM ] = useCanister("MWCM")
+  const [MWCM] = useCanister("MWCM")
   const { res, isFetching, getData } = useFetch(MWCM,  ['proposes'])
   const [ isVoting, setVoting ] = useState(false)
 
@@ -51,8 +51,7 @@ export default function PageProposals() {
         <div className="grid gap-x-4 grid-cols-2">
           <LinkBtn name="group">Who we are</LinkBtn>
           <LinkBtn name="canister">What we have</LinkBtn>
-        </div>
-        {isVoting && <Loader style={{zIndex:'20000'}} content="loading..." size="md" backdrop center vertical />}
+        </div>        
         <div className="grid gap-y-4 text-center mt-8">          
           {
             list.length<=0 
@@ -62,9 +61,9 @@ export default function PageProposals() {
         </div>
       </div>
     )
-  }, [res, isFetching, isVoting])
+  }, [res, isFetching])
 
-  useEffect(()=>{ getData() }, [MWCM])
+  useEffect(()=>{ MWCM && getData() }, [MWCM])
 
   return (
     <div className="page-wrapper page-center">
@@ -74,7 +73,8 @@ export default function PageProposals() {
           <AddSquare size="32" color="#37d67a" variant="TwoTone"/>   
         </LinkBtn>           
       </h2>      
-      <p className="mb-4">Vote to decide if the proposal is implemented</p>    
+      <p className="mb-4">Vote to decide if the proposal is implemented</p>
+      {isVoting && <Loader style={{zIndex:'10'}} content="loading..." size="md" backdrop center vertical />}      
       {renderList}
     </div>
   )
