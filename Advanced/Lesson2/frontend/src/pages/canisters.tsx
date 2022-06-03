@@ -13,6 +13,8 @@ export default function PageCanisters() {
   const { res, isFetching, getData } = useFetch(MWCM, ['canisters'])
 
   const handleStats = useCallback(async (cid: any) => {
+    toaster.push(<Message showIcon type="warning">Un supported yet.</Message>)
+    if("close".length === 5){ return }
     try{
       const _stats = await MWCM.checkCanisters(cid)
       return _stats

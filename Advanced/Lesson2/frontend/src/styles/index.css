@@ -154,7 +154,6 @@ body {
     transform-style: preserve-3d;
     transition: all .28s ease-in-out;
 }
-
 @keyframes rush {
     0%,100%{
         background-blend-mode: multiply;
@@ -177,5 +176,28 @@ body {
         background-blend-mode: multiply;
         background-color: rebeccapurple;
         transform: translateZ(0);
+    }
+}
+.propose-createImg{
+    margin-top: 1rem;
+    height: 20em;
+    width: 24em;
+    background-color: rgba(255,255,255,.8);    
+    background-position: center bottom;
+    background-repeat: no-repeat;
+    background-blend-mode: hard-light;
+    background-size: cover;    
+    clip-path: polygon(50% 0%, 83% 12%, 100% 43%, 94% 78%, 68% 100%, 32% 100%, 6% 78%, 0% 43%, 17% 12%);
+    box-shadow: inset 0px 0 20px 5px rgb(255 255 255 / 68%);
+    filter: hue-rotate(0);
+    transition: all .3s ease-in-out;
+    animation: hueFlash infinite 2.4s ease-in-out;
+}
+@keyframes hueFlash {
+    0%,100%{
+        filter: hue-rotate(0);
+    }
+    50%{
+        filter: hue-rotate(360deg);
     }
 }

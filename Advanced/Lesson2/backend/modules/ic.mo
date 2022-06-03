@@ -24,16 +24,17 @@ module {
   };
   public type user_id = Principal;
   public type wasm_module = [Nat8];
+  public type canisterStats = {
+    status : { #stopped; #stopping; #running };
+    freezing_threshold : Nat;
+    memory_size : Nat;
+    cycles : Nat;
+    settings : definite_canister_settings;
+    module_hash : ?[Nat8];
+    idle_cycles_burned_per_second : ?Nat;
+  };
   public type Self = actor {
-    canister_status : shared { canister_id : canister_id } -> async {
-        status : { #stopped; #stopping; #running };
-        freezing_threshold : Nat;
-        memory_size : Nat;
-        cycles : Nat;
-        settings : definite_canister_settings;
-        module_hash : ?[Nat8];
-        idle_cycles_burned_per_second : Float;
-      };
+    canister_status : shared { canister_id : canister_id } -> async canisterStats;
     create_canister : shared { settings : ?canister_settings } -> async {
         canister_id : canister_id;
       };

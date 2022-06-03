@@ -40,15 +40,6 @@ actor class (g : [Principal], pn : Nat) = self {
     cid : Principal;
     auth : Bool;
   };
-  public type CanisterStats = {
-    status : { #stopped; #stopping; #running };
-    freezing_threshold : Nat;
-    memory_size : Nat;
-    cycles : Nat;
-    settings : IC.definite_canister_settings;
-    module_hash : ?[Nat8];
-    idle_cycles_burned_per_second : Float;
-  };
   /*  Vars  */
 
   //  all cansiters
@@ -79,7 +70,7 @@ actor class (g : [Principal], pn : Nat) = self {
   public query func getProposes(id : ProposalId) : async ?Proposal {
     _proposeMap.get(id)
   };
-  public func checkCanisters(canister_id : Principal) : async CanisterStats {
+  public func checkCanisters(canister_id : Principal) : async IC.canisterStats {
     assert(_existCanister(canister_id));
     let _ic : IC.Self = actor("aaaaa-aa");
     await _ic.canister_status({canister_id});
@@ -282,7 +273,7 @@ actor class (g : [Principal], pn : Nat) = self {
           let cid = result.canister_id;
           _canisterMap.put(cid, { cid; auth = true; });
           _proposeMap.put(id, settleVote(newProposal));
-          return #ok("CANISTER CREATE" #Principal.toText(cid))  
+          return #ok("CANISTER CREATE ! " #Principal.toText(cid))  
         } else {          
           await handleCanister(newProposal);  
         };
