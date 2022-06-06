@@ -8,6 +8,8 @@ import Option "mo:base/Option";
 import Principal "mo:base/Principal";
 import Result "mo:base/Result";
 import Text "mo:base/Text";
+import SHA256 "./modules/SHA256";
+import HEX "./modules/HEX";
 import IC "./modules/ic";
 
 /**
@@ -90,6 +92,9 @@ actor class (_g : [Principal], _pn : Nat) = self {
 
   /*  hooks */
 
+  private func _sha256ToHex(_b : Blob) : Text {
+    HEX.encode(SHA256.sha256(Blob.toArray(_b)));
+  };
   private func _isMember(member : Member) : Bool {
     // true;
     if(g.size() <= 0) { return false; };
@@ -260,9 +265,12 @@ actor class (_g : [Principal], _pn : Nat) = self {
 
   /*  update  */
 
-  public shared({ caller }) func propose (pType : ProposalType, canister_id: ?Principal, wasm_code : ?Blob, wasm_sha256: ?Text) : async Result.Result<Text, Text> {
+  public shared({ caller }) func propose (pType : ProposalType, canister_id: ?Principal, wasm_code : ?Blob) : async Result.Result<Text, Text> {
     //  check auth
     if( not _isMember(caller) and pType != #join ){ return #err("YOU ARE NOT MEMBER"); };
+    
+    var wasm_sha256 = "";
+
     //  check params
     if (pType != #create) {
       switch (canister_id) {
@@ -272,9 +280,11 @@ actor class (_g : [Principal], _pn : Nat) = self {
         };
         case null { return #err("LOST CANISTER"); };
       };
-      if (pType == #install) { 
-        if(Option.isNull(wasm_code)) { return #err("LOST WASM_CODE"); };
-        if(Option.isNull(wasm_sha256)) { return #err("LOST WASM_SHA256"); };         
+      if (pType == #install) {
+        switch (wasm_code) {
+          case (?code) { wasm_sha256 := _sha256ToHex(code); };
+          case null { return #err("LOST WASM_CODE"); };
+        };
       };
     };
     //  get nextId
@@ -286,7 +296,7 @@ actor class (_g : [Principal], _pn : Nat) = self {
       pType;
       canister_id;
       wasm_code;
-      wasm_sha256;
+      wasm_sha256 = ?wasm_sha256;
       approvers = [];
       settled = false;
     });

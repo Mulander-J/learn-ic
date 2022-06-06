@@ -42,7 +42,7 @@ export const idlFactory = ({ IDL }) => {
     'wasm_code' : IDL.Opt(IDL.Vec(IDL.Nat8)),
   });
   const Result = IDL.Variant({ 'ok' : IDL.Text, 'err' : IDL.Text });
-  const anon_class_16_1 = IDL.Service({
+  const anon_class_18_1 = IDL.Service({
     'acceptCycles' : IDL.Func([], [IDL.Nat], []),
     'canisters' : IDL.Func([], [IDL.Vec(AuthCanister)], ['query']),
     'checkCanisters' : IDL.Func([IDL.Principal], [canisterStats], []),
@@ -57,18 +57,13 @@ export const idlFactory = ({ IDL }) => {
     'groups' : IDL.Func([], [IDL.Vec(Member)], ['query']),
     'passNum' : IDL.Func([], [IDL.Nat], ['query']),
     'propose' : IDL.Func(
-        [
-          ProposalType,
-          IDL.Opt(IDL.Principal),
-          IDL.Opt(IDL.Vec(IDL.Nat8)),
-          IDL.Opt(IDL.Text),
-        ],
+        [ProposalType, IDL.Opt(IDL.Principal), IDL.Opt(IDL.Vec(IDL.Nat8))],
         [Result],
         [],
       ),
     'proposes' : IDL.Func([], [IDL.Vec(Proposal), IDL.Nat, IDL.Nat], ['query']),
     'vote' : IDL.Func([ProposalId, IDL.Bool], [Result], []),
   });
-  return anon_class_16_1;
+  return anon_class_18_1;
 };
 export const init = ({ IDL }) => { return [IDL.Vec(IDL.Principal), IDL.Nat]; };

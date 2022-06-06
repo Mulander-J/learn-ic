@@ -33,40 +33,43 @@ import canister = "rrkah-fqaaa-aaaaa-aaaaq-cai";
 // change to id1
 // identity default "./resources/identity/id1.pem";
 // propose to install code into above canister by id1
-let canister_id = principal "r7inp-6aaaa-aaaaa-aaabq-cai";
-call canister.propose(variant {install}, opt canister_id, opt file "./resources/sample/sample.wasm");
-let proposal_id2 = _.ok;
+// let canister_id = principal "r7inp-6aaaa-aaaaa-aaabq-cai";
+// call canister.propose(variant {install}, opt canister_id, opt file "./resources/sample/sample.wasm");
+// let proposal_id2 = _.ok;
+
+call canister.test(file "./resources/sample/sample.wasm");
+_;
 
 // vote the above proposal by id1
-call canister.vote(proposal_id2, true);
+// call canister.vote(proposal_id2, true);
 
 // change to id2
-identity default "./resources/identity/id2.pem";
+// identity default "./resources/identity/id2.pem";
 
 // vote the above proposal by id2, and execute the installing code
-call canister.vote(proposal_id2, true);
+// call canister.vote(proposal_id2, true);
 
 //---------------START CANISTER---------------//
 
 // change to id1
-identity default "./resources/identity/id1.pem";
+// identity default "./resources/identity/id1.pem";
 
 // propose to start the canister by id1
-call canister.propose(variant {start}, opt canister_id, null);
-let proposal_id3 = _;
+// call canister.propose(variant {start}, opt canister_id, null);
+// let proposal_id3 = _;
 
 // vote the above proposal by id1
-call canister.vote(proposal_id3, true);
+// call canister.vote(proposal_id3, true);
 
 // change to id2
-identity default "./resources/identity/id2.pem";
+// identity default "./resources/identity/id2.pem";
 
 // vote the above proposal by id2, and execute the starting canister
-call canister.vote(proposal_id3, true);
+// call canister.vote(proposal_id3, true);
 
 //---------------CALL CANISTER---------------//
 
 // call the installed canister
-call canister_id.greet("world");
+// call canister_id.greet("world");
 
 // assert _ == "This is Sample for install.";
