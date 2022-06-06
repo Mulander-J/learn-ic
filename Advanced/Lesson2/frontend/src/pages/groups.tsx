@@ -38,7 +38,7 @@ export default function PageGroups() {
         if(res) {
           toaster.push(<Message showIcon type="info">The application failed, perhaps you have already submitted an application.</Message>)
         }else{
-          await MWCM.propose({leave:null}, [temp.principal], [], [])
+          await MWCM.propose({leave:null}, [temp.principal], [])
           toaster.push(<Message showIcon type="info">Application Sent.</Message>)
         }
       }      

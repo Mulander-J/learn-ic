@@ -41,7 +41,7 @@ export default function Membership() {
         toaster.push(<Message showIcon type="info">The application failed, perhaps you have already submitted an application or are already a member.</Message>)
         return null
       }
-      await MWCM.propose({join:null}, [_pri], [], [])
+      await MWCM.propose({join:null}, [_pri], [])
       toaster.push(<Message showIcon type="info">Application Sent.</Message>)
     }catch(err: any){
       const msg = errHandle(err)

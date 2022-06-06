@@ -24,10 +24,10 @@ then
 elif [ $1 == "propose" ]
 then
   echo "===>Add proposal"
-  $_cmdHead propose '(variant {create}, null, null, null)'
-  # $_cmdHead propose '(variant {join}, opt principal "cnh44-cjhoh-yyoqz-tcp2t-yto7n-6vlpk-xw52p-zuo43-rrlge-4ozr5-6ae", null, null)'
-  # $_cmdHead propose '(variant {auth}, opt principal "r7inp-6aaaa-aaaaa-aaabq-cai", null, null)'
-  # $_cmdHead propose '(variant {auth}, opt principal "dyhvq-iaaaa-aaaal-qa4ta-cai", null, null)'
+  $_cmdHead propose '(variant {create}, null, null)'
+  # $_cmdHead propose '(variant {join}, opt principal "cnh44-cjhoh-yyoqz-tcp2t-yto7n-6vlpk-xw52p-zuo43-rrlge-4ozr5-6ae", null)'
+  # $_cmdHead propose '(variant {auth}, opt principal "r7inp-6aaaa-aaaaa-aaabq-cai", null)'
+  # $_cmdHead propose '(variant {auth}, opt principal "dyhvq-iaaaa-aaaal-qa4ta-cai", null)'
   # echo "===>Fetch proposes"
   # $_cmdHead proposes
 elif [ $1 == "vote" ]
