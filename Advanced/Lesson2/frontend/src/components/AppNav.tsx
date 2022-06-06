@@ -22,6 +22,9 @@ export default function AppNav () {
           {menus.map(m=><Nav.Item eventKey={m.path} key={m.name}>{m?.meta?.title}</Nav.Item>)}
         </Nav>
         <Nav pullRight>
+          <Nav.Item>
+            <div className="borkenTxt" onClick={()=>{navigate('/membership')}}>Join Us</div>
+          </Nav.Item>
           <Nav.Item className="app-connect">
             {isConnected && <UserAvatar principal={ principal } />}
             <ConnectButton dark />

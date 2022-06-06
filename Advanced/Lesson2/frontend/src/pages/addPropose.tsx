@@ -1,9 +1,14 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useState, useRef } from 'react'
 import { useNavigate } from "react-router-dom"
 import { CSSTransition } from 'react-transition-group'
 import { errHandle } from "@/utils"
+import { PrincipalFrTxt } from "@/utils/ic4mat"
 import { useCanister, useConnect } from "@connect2ic/react"
-import { Modal, Form, ButtonToolbar, Button, SelectPicker, Message, toaster } from 'rsuite'
+import { 
+  Modal, ButtonToolbar, Button, 
+  Schema, Form, SelectPicker, Uploader,
+  Loader, Message, toaster
+} from 'rsuite'
 import { pTypeInfo } from "@/utils/constant"
 import ImgBarrel4 from "@img/barrel-004.jpg"
 
@@ -18,16 +23,21 @@ const pTypeData = Object
 const initFormValue = {
   pType: '',
   canisterId: '',
-  wasm_code: '',
+  wasm_code: null,
   wasm_sha256: '',
 }
+
+const ruleRequire = Schema.Types.StringType().isRequired('This field is required.')
 
 export default function AddPropose() {
   const navigate = useNavigate()
   const { isConnected } = useConnect()
   const [MWCM] = useCanister("MWCM")
 
+  const formRef:any = useRef()
+
   const [open, setOpen] = useState(false)
+  const [isLoading, setLoad] = useState(false)
   const [formValue, setFormValue] = useState<any>(initFormValue);
 
   const handleOpen = () => setOpen(true)
@@ -36,31 +46,55 @@ export default function AddPropose() {
     handleClose()
     navigate('/') 
   }
-  const onSubmit = useCallback(()=>{
-    if(!isConnected){
-      toaster.push(<Message showIcon type="warning">Please Connect!</Message>)
-      return null
-    }
+  const uploadWasm = (file:any)=>{
+    console.log('uploadWasm',file)
+  }
+  const onSubmit = useCallback(async ()=>{
+    if(isLoading) return
     try{
-      console.log('[formValue]', formValue)
-      toaster.push(<Message showIcon type="info">Nothing happens.</Message>)
-      // navigate('/') 
+      if(!isConnected){  throw Error('Please Connect!') }
+      if (!formRef?.current.check()) { throw Error('Form Error') }
+      const {pType,canisterId} = formValue
+      const _canisterId = await PrincipalFrTxt(canisterId)
+      if(!_canisterId && pType !== 'create'){ throw Error('Please input correct canisterId!') }     
+
+      const payloads = [
+        {[pType]:null},
+        _canisterId ? [_canisterId] : [],
+        formValue.wasm_code ? [formValue.wasm_code] : [],
+        formValue.wasm_sha256 ? [formValue.wasm_sha256] : []
+      ]
+      console.log('[payloads]', payloads)
+
+      setLoad(true)
+      // const res: any = MWCM.propose(payloads)
+      // if(res?.err){
+      //   toaster.push(<Message showIcon type="error">{res?.err}</Message>)
+      // } else if(res?.ok){
+      //   toaster.push(<Message showIcon type="success">Propose Success! ID: {res?.ok}</Message>)
+      // }
     }catch(err: any){
       const msg = errHandle(err)
       toaster.push(<Message showIcon type="error">{msg}</Message>)
-      return null
+    }finally{
+      setLoad(false)
     }
-  },[MWCM,isConnected,formValue])
+  },[MWCM,isConnected,formValue,formRef])
 
 
   return (
     <div className="page-wrapper page-center page-propose">
       <h2 className="app-title1">Propose</h2>
       <section className="propose-cover"></section>
-      <Form className='bg-black bg-opacity-40 py-4 px-8 rounded-lg' fluid model={formValue} onChange={formValue => setFormValue(formValue)}>
+      {  isLoading && <Loader style={{zIndex:'10'}} content="loading..." size="md" backdrop center vertical /> }
+      <Form 
+        className='bg-black bg-opacity-40 py-4 px-8 rounded-lg' 
+        fluid ref={formRef} model={formValue} 
+        onChange={formValue => setFormValue(formValue)}
+      >
         <Form.Group controlId="pType">
           <Form.ControlLabel>Propose Case:</Form.ControlLabel>
-          <Form.Control name="pType" accepter={SelectPicker} data={pTypeData} />
+          <Form.Control name="pType" accepter={SelectPicker} data={pTypeData} rule={ruleRequire} />
           <Form.HelpText>Required</Form.HelpText>
         </Form.Group>
         {
@@ -68,7 +102,7 @@ export default function AddPropose() {
           && (
             <Form.Group controlId="canisterId">
               <Form.ControlLabel>CanisterId</Form.ControlLabel>
-              <Form.Control name="canisterId" value={formValue.canisterId} />
+              <Form.Control name="canisterId" value={formValue.canisterId} rule={ruleRequire} />
               <Form.HelpText>Required</Form.HelpText>
             </Form.Group>
           )
@@ -79,13 +113,12 @@ export default function AddPropose() {
             <>
               <Form.Group controlId="wasm_code">
                 <Form.ControlLabel>WASM Code</Form.ControlLabel>
-                <Form.Control name="wasm_code" />
-                <Form.HelpText tooltip>Required</Form.HelpText>
+                <Uploader accept='.wasm' action="" autoUpload={false} onChange={uploadWasm}/>                
               </Form.Group>
               <Form.Group controlId="wasm_sha256">
                 <Form.ControlLabel>WASM Code SHA256</Form.ControlLabel>
-                <Form.Control name="wasm_sha256" />
-                <Form.HelpText tooltip>Required</Form.HelpText>
+                <Form.Control name="wasm_sha256" plaintext rule={ruleRequire} />
+                <Form.HelpText tooltip>Auto Generated By WASM Code</Form.HelpText>
               </Form.Group>
             </>
           )

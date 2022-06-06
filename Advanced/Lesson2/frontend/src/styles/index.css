@@ -40,6 +40,36 @@ body {
 .app-IconBtn{
     @apply mx-2 cursor-pointer select-none;
 }
+.borkenTxt{
+    display: inline-block;
+    font-size: 2rem;
+    font-weight: 600;
+    padding: 0 4px;
+    color: white;
+    position: relative;
+    animation: uk-text-shadow-glitch .65s cubic-bezier(1,-1.91,0,2.79) 0s infinite normal both running;
+    animation-play-state: paused;
+}
+.borkenTxt:hover{
+    animation-play-state: running;
+}
+@keyframes uk-text-shadow-glitch {
+    0% {
+        text-shadow: none
+    }
+    25% {
+        text-shadow: -2px -2px 0 #ff004f,2px 2px 0 #00f7ef
+    }
+    50% {
+        text-shadow: 2px -2px 0 #ff004f,-2px 2px 0 #00f7ef
+    }
+    75% {
+        text-shadow: -2px 2px 0 #ff004f,2px -2px 0 #00f7ef
+    }
+    100% {
+        text-shadow: 2px 2px 0 #ff004f,-2px -2px 0 #00f7ef
+    }
+}
 .app-home {
     @apply grid text-center justify-center items-center h-full w-full relative;
 }
@@ -59,7 +89,7 @@ body {
     opacity: 1;
 }
 .app-home .app-btn:hover +section .app-vMask{
-    filter: blur(8px);
+    filter: blur(10px);
 }
 /*  page-layout */
 .page-wrapper {

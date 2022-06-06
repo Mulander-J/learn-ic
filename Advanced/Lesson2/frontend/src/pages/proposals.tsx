@@ -3,11 +3,24 @@ import { useCanister, useConnect } from "@connect2ic/react"
 import { AddSquare, Like1, LikeDislike } from 'iconsax-react'
 import { Tag, Progress, Tooltip, Whisper, Divider, Message, Loader, toaster } from 'rsuite'
 import useFetch from "@/hooks/useFetch"
-import { unWrap, strSlice, errHandle } from "@/utils"
+import { strSlice, errHandle } from "@/utils"
+import { unWrap } from "@/utils/ic4mat"
 import LinkBtn from "@/components/LinkBtn"
 import HolderBlock from "@/components/HolderBlock"
 import UserAvatar from "@/components/UserAvatar"
 import { pTypeInfo } from '@/utils/constant'
+
+const PTypes = {
+  ...pTypeInfo,
+  'join': {
+    color: 'blue',
+    desc: 'New Member Application'
+  },
+  'leave':{
+    color:'orange',
+    desc: 'Please Kick out him/her'
+  },
+}
 
 export default function PageProposals() {
   const { isConnected } = useConnect()
@@ -83,7 +96,7 @@ export default function PageProposals() {
 const ItemCard = (props: any)=>{
   const { item, m, onVote } = props  
   const pType = Object.keys(item?.pType)[0]
-  const _info = pTypeInfo?.[pType] || {
+  const _info = PTypes?.[pType] || {
     color:'violet',
     desc: 'Proposal'
   }
@@ -125,7 +138,7 @@ const ItemCard = (props: any)=>{
       <Divider />
       {_d?.canister_id && (
         <p className="my-4 text-red-400">
-          <label>CanisterId: </label>
+          <label>{(pType === 'join' || pType === 'leave') ? 'Principal':'CanisterId'}: </label>
           <span>{strSlice(_d.canister_id.toString())}</span>
         </p>
       )}
