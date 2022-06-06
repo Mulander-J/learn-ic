@@ -6,7 +6,7 @@ export const idlFactory = ({ IDL }) => {
     'memory_allocation' : IDL.Nat,
     'compute_allocation' : IDL.Nat,
   });
-  const CanisterStats = IDL.Record({
+  const canisterStats = IDL.Record({
     'status' : IDL.Variant({
       'stopped' : IDL.Null,
       'stopping' : IDL.Null,
@@ -17,14 +17,16 @@ export const idlFactory = ({ IDL }) => {
     'cycles' : IDL.Nat,
     'settings' : definite_canister_settings,
     'module_hash' : IDL.Opt(IDL.Vec(IDL.Nat8)),
-    'idle_cycles_burned_per_second' : IDL.Float64,
+    'idle_cycles_burned_per_second' : IDL.Opt(IDL.Nat),
   });
-  const ProposalId = IDL.Text;
   const Member = IDL.Principal;
+  const ProposalId = IDL.Text;
   const ProposalType = IDL.Variant({
     'auth' : IDL.Null,
+    'join' : IDL.Null,
     'stop' : IDL.Null,
     'delete' : IDL.Null,
+    'leave' : IDL.Null,
     'create' : IDL.Null,
     'start' : IDL.Null,
     'install' : IDL.Null,
@@ -43,7 +45,8 @@ export const idlFactory = ({ IDL }) => {
   const anon_class_16_1 = IDL.Service({
     'acceptCycles' : IDL.Func([], [IDL.Nat], []),
     'canisters' : IDL.Func([], [IDL.Vec(AuthCanister)], ['query']),
-    'checkCanisters' : IDL.Func([IDL.Principal], [CanisterStats], []),
+    'checkCanisters' : IDL.Func([IDL.Principal], [canisterStats], []),
+    'checkJoinRejct' : IDL.Func([Member], [IDL.Bool], []),
     'getAuthCanister' : IDL.Func(
         [IDL.Principal],
         [IDL.Opt(AuthCanister)],

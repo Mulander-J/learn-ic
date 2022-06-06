@@ -5,12 +5,12 @@ _cmdHead="dfx canister call MWCM"
 # _cmdHead="dfx canister --network=ic --wallet=yz336-daaaa-aaaal-qag3a-cai call e5x6l-faaaa-aaaal-qa36q-cai"
 # _cmdHead="dfx canister --network=ic call e5x6l-faaaa-aaaal-qa36q-cai"
 echo "===>RUN WAY="$1
-
 if [ $1 == "deploy" ]
 then
   echo "===>Deploy"
   echo "===>Deployer Principal:" $(dfx identity get-principal)
-  dfx deploy --argument='(vec {principal "cnh44-cjhoh-yyoqz-tcp2t-yto7n-6vlpk-xw52p-zuo43-rrlge-4ozr5-6ae"; principal "ndb4h-h6tuq-2iudh-j3opo-trbbe-vljdk-7bxgi-t5eyp-744ga-6eqv6-2ae"; principal "lzf3n-nlh22-cyptu-56v52-klerd-chdxu-t62na-viscs-oqr2d-kyl44-rqe"}, 2)'
+  dfx deploy --argument='(vec {principal "'$(dfx identity get-principal)'";}, 2)'
+  # dfx deploy --network=ic --argument='(vec {principal "'$(dfx identity get-principal)'";}, 2)'
 elif [ $1 == "fetch" ]
 then
   echo "===>Fetch Groups"
@@ -25,10 +25,11 @@ elif [ $1 == "propose" ]
 then
   echo "===>Add proposal"
   $_cmdHead propose '(variant {create}, null, null, null)'
+  # $_cmdHead propose '(variant {join}, opt principal "cnh44-cjhoh-yyoqz-tcp2t-yto7n-6vlpk-xw52p-zuo43-rrlge-4ozr5-6ae", null, null)'
   # $_cmdHead propose '(variant {auth}, opt principal "r7inp-6aaaa-aaaaa-aaabq-cai", null, null)'
   # $_cmdHead propose '(variant {auth}, opt principal "dyhvq-iaaaa-aaaal-qa4ta-cai", null, null)'
-  echo "===>Fetch proposes"
-  $_cmdHead proposes
+  # echo "===>Fetch proposes"
+  # $_cmdHead proposes
 elif [ $1 == "vote" ]
 then
   if [ $3 == 0 ]

@@ -1,9 +1,11 @@
 import React, { useEffect, useMemo, useState, useCallback } from "react"
+import { useCanister } from "@connect2ic/react"
+import { CSSTransition } from 'react-transition-group'
+import { Lock1, MoreSquare } from 'iconsax-react'
+import { FlexboxGrid, Loader, Divider, Whisper, Tooltip, Message, toaster } from 'rsuite'
 import useFetch from "@/hooks/useFetch"
 import { errHandle } from "@/utils"
-import { useCanister } from "@connect2ic/react"
-import { Lock1, MoreSquare } from 'iconsax-react'
-import { FlexboxGrid, Whisper, Tooltip, Message, toaster } from 'rsuite'
+import { onlyVec } from "@/utils/ic4mat"
 import UserAvatar from "@/components/UserAvatar"
 import LinkBtn from "@/components/LinkBtn"
 import HolderBlock from "@/components/HolderBlock"
@@ -13,8 +15,6 @@ export default function PageCanisters() {
   const { res, isFetching, getData } = useFetch(MWCM, ['canisters'])
 
   const handleStats = useCallback(async (cid: any) => {
-    toaster.push(<Message showIcon type="warning">Un supported yet.</Message>)
-    if("close".length === 5){ return }
     try{
       const _stats = await MWCM.checkCanisters(cid)
       return _stats
@@ -57,9 +57,13 @@ export default function PageCanisters() {
 function CanisterCard (props:any) {
   const { item, onStats } = props
   const [stats, setStats] = useState<any>(null)
+  const [isLoading, setLoad] = useState(false)
   const getMore = async ()=>{
+    setLoad(true)
     const res = await onStats(item.cid)
+    // console.log('getMore', res)
     setStats(res || null)
+    setLoad(false)
   } 
   return (
     <div className="w-full">
@@ -74,29 +78,40 @@ function CanisterCard (props:any) {
         </FlexboxGrid.Item>
         <FlexboxGrid.Item>
           <label>More Info</label>
-          <Whisper speaker={<Tooltip>Check More Detail</Tooltip>}>
-            <MoreSquare onClick={getMore} className="app-IconBtn my-2" size="20" color="#FF8A65"/>
-          </Whisper>          
+          {
+            isLoading 
+            ? <Loader  className="block my-2"/> 
+            : (
+              <Whisper speaker={<Tooltip>Check More Detail</Tooltip>}>            
+                <MoreSquare onClick={getMore} className="app-IconBtn my-2" size="20" color="#FF8A65"/>
+              </Whisper>     
+            )
+          }                     
         </FlexboxGrid.Item>      
       </FlexboxGrid>
-      {
-        stats && (
-          <div>
-            <div>
-              <label>status</label>
-              <p>{stats?.status}</p>
-            </div>
-            <div>
-              <label>cycles</label>
-              <p>{stats?.cycles}</p>
-            </div>
-            <div>
-              <label>module_hash</label>
-              <p>{stats?.module_hash}</p>
-            </div>
-          </div>
-        )
-      }
+      <CSSTransition in={!!stats} classNames="fade" timeout={300} unmountOnExit>
+        <>
+          <Divider/>
+          {
+            stats && (
+              <FlexboxGrid align="top" justify="space-between">
+                <FlexboxGrid.Item>
+                  <label>status</label>
+                  <p>{onlyVec(stats?.status)}</p>
+                </FlexboxGrid.Item>
+                <FlexboxGrid.Item>
+                  <label>cycles</label>
+                  <p>{Number(stats?.cycles)}</p>
+                </FlexboxGrid.Item>
+                <FlexboxGrid.Item>
+                  <label>module_hash</label>
+                  <p>{stats?.module_hash}</p>
+                </FlexboxGrid.Item>
+              </FlexboxGrid>
+            )
+          }
+        </>
+      </CSSTransition>
     </div>
   )
 }

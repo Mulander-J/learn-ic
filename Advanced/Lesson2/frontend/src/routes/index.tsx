@@ -8,6 +8,7 @@ const PageGroups = lazy(async () => import('./../pages/groups'))
 const PageProposals = lazy(async () => import('./../pages/proposals'))
 const PageCanisters = lazy(async () => import('./../pages/canisters'))
 const PagePropose = lazy(async () => import('./../pages/addPropose'))
+const PageMembership = lazy(async () => import('./../pages/membership'))
 
 export default function Routers () {
   const location = useLocation()
@@ -21,6 +22,7 @@ export default function Routers () {
             <Route path='/proposals' element={<PageProposals/>}/>
             <Route path='/canisters' element={<PageCanisters/>} />
             <Route path='/propose' element={<PagePropose/>} />
+            <Route path='/membership' element={<PageMembership/>} />
             <Route path="*" element={<NoMatch />} />
           </Routes>   
         </Suspense>         

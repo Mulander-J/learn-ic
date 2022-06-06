@@ -13,7 +13,7 @@ import IC "./modules/ic";
 /**
 * Multi-Wallet Canister Manager
 */
-actor class (g : [Principal], pn : Nat) = self {
+actor class (_g : [Principal], _pn : Nat) = self {
   /*  globle type */
 
   public type Member = Principal;
@@ -25,6 +25,8 @@ actor class (g : [Principal], pn : Nat) = self {
     #install;
     #start;
     #stop;
+    #join;
+    #leave;
   };
   public type Proposal = {
     id : ProposalId;
@@ -41,7 +43,8 @@ actor class (g : [Principal], pn : Nat) = self {
     auth : Bool;
   };
   /*  Vars  */
-
+  private stable var g = _g;
+  private stable var pn = _pn;
   //  all cansiters
   private stable var _canisterEntries : [(Principal, AuthCanister)] = [];
   private var _canisterMap = HashMap.fromIter<Principal, AuthCanister>(_canisterEntries.vals(), 10, Principal.equal, Principal.hash);
@@ -88,17 +91,34 @@ actor class (g : [Principal], pn : Nat) = self {
   /*  hooks */
 
   private func _isMember(member : Member) : Bool {
-    true;
-    // if(g.size() <= 0) { return false; };
-    // Option.isSome(Array.find<Member>(g, func (a) : Bool { Principal.equal(a, member)}))
+    // true;
+    if(g.size() <= 0) { return false; };
+    Option.isSome(Array.find<Member>(g, func (a) : Bool { Principal.equal(a, member)}))
   };
   private func _existCanister(canister_id : Principal) : Bool {
     Option.isSome(_canisterMap.get(canister_id));
   };
+  private func _duplicateProposal(pType : ProposalType, canister_id: Principal) : Bool {
+    let _arr = Iter.toArray(_proposeMap.vals());
+    Option.isSome(Array.find<Proposal>(
+      _arr, 
+      func (a) : Bool { 
+        switch(a.canister_id){
+          case(?id){
+            Principal.equal(id, canister_id) 
+              and (a.pType == pType)
+              and (not a.settled);
+          };
+          case null { false }
+        };
+      }
+    ));
+  };
   private func checkThreashhold(proposal : Proposal) : Bool {
+    let initLimit = (g.size() < pn);
     switch (proposal.pType) {
-      case (#create) {
-        return proposal.approvers.size() >= pn
+      case (#create or #leave or #join) {
+        return initLimit or (proposal.approvers.size() >= pn);
       };
       case _ {
         switch (proposal.canister_id) {
@@ -106,7 +126,7 @@ actor class (g : [Principal], pn : Nat) = self {
             switch (_canisterMap.get(id)) { 
               case (?canister) {
                 if (canister.auth) {
-                  return proposal.approvers.size() >= pn
+                  return initLimit or (proposal.approvers.size() >= pn);
                 }else{
                   return true
                 };
@@ -173,6 +193,29 @@ actor class (g : [Principal], pn : Nat) = self {
       case null { return #err("LOST CANISTER_ID"); };
     };
   };
+  private func handleGroup(p: Proposal) : async Result.Result<Text, Text> {
+    let pType = p.pType;
+    assert(pType == #leave or pType == #join);
+    switch(p.canister_id){
+      case(?canister_id){
+        let id = Principal.toText(canister_id);
+        _proposeMap.put(p.id, settleVote(p));
+        if(pType == #leave){
+          if(g.size() == 1){ return #err("MEMBER.TOL AT LEAST 1") };
+          g := Array.filter<Member>(g, func(a) {not Principal.equal(a, canister_id)});           
+          return #ok("MEMBER LEFT: " #id);
+        }else{
+          if (Option.isSome(Array.find<Member>(g, func(a) {a == canister_id}))) {
+            return #ok("MEMBER ALREADY EXIST: " #id);
+          };
+          if(g.size() > pn){ pn += 1; };
+          g := Array.append<Member>(g, [canister_id]);
+          return #ok("MEMBER JOINED: " #id);
+        }        
+      };
+      case null { return #err("LOST ID"); };
+    };    
+  };
   private func updateVote(m : Member, p : Proposal, b : Bool) : Proposal {
     {
       id = p.id;
@@ -210,16 +253,23 @@ actor class (g : [Principal], pn : Nat) = self {
       approvers = p.approvers
     }
   };
+  public func checkJoinRejct(member: Member) : async Bool {
+    if(_isMember(member)) return true;
+    return _duplicateProposal(#join, member);
+  };
 
   /*  update  */
 
   public shared({ caller }) func propose (pType : ProposalType, canister_id: ?Principal, wasm_code : ?Blob, wasm_sha256: ?Text) : async Result.Result<Text, Text> {
     //  check auth
-    assert(_isMember(caller));
+    if( not _isMember(caller) and pType != #join ){ return #err("YOU ARE NOT MEMBER"); };
     //  check params
     if (pType != #create) {
       switch (canister_id) {
-        case (?id) { if (not _existCanister(id)) { return #err("CANSITER IS NOT FOUND") }; };
+        case (?id) {
+          if (_duplicateProposal(pType, id)) { return #err("PROPOSAL IS DUPLICATE") };
+          if (not _existCanister(id) and (pType != #join and pType != #leave)) { return #err("CANSITER IS NOT FOUND") }; 
+        };
         case null { return #err("LOST CANISTER"); };
       };
       if (pType == #install) { 
@@ -247,7 +297,7 @@ actor class (g : [Principal], pn : Nat) = self {
   };
   public shared({ caller }) func vote (id : ProposalId, chosen : Bool) : async Result.Result<Text, Text> {
     //  check auth
-    assert(_isMember(caller));
+    if (not _isMember(caller)) { return #err("YOU ARE NOT MEMBER"); };
     //  update vote after find the proposal
     switch (_proposeMap.get(id)) {
       case (?proposal) {
@@ -260,7 +310,9 @@ actor class (g : [Principal], pn : Nat) = self {
         let _next = checkThreashhold(newProposal);
         if(not _next){ return #ok(if(chosen){"Vote Added"}else{"Vote Revoked"}); };
         //  meet threashhold
-        if (proposal.pType == #create) {
+        if (proposal.pType == #join or proposal.pType == #leave) {
+          await handleGroup(newProposal);
+        } else if (proposal.pType == #create) {
           let settings = {
             freezing_threshold = null;
             controllers = ?[Principal.fromActor(self)];
