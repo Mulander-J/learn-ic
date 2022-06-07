@@ -263,6 +263,14 @@ actor class (_g : [Principal], _pn : Nat) = self {
     return _duplicateProposal(#join, member);
   };
 
+  // public func test(_b : Blob) : async (Bool, Text) {
+  //   let hex = HEX.encode(SHA256.sha256(Blob.toArray(_b)));
+  //   return (
+  //     hex == "bf1b5fff842700e36a1a4489996d214dab15e90f792b72b08bc7812431dcdba2",
+  //     hex
+  //   )
+  // };
+
   /*  update  */
 
   public shared({ caller }) func propose (pType : ProposalType, canister_id: ?Principal, wasm_code : ?Blob) : async Result.Result<Text, Text> {
@@ -282,7 +290,10 @@ actor class (_g : [Principal], _pn : Nat) = self {
       };
       if (pType == #install) {
         switch (wasm_code) {
-          case (?code) { wasm_sha256 := _sha256ToHex(code); };
+          case (?code) { 
+            // wasm_sha256 := _sha256ToHex(code);
+            wasm_sha256 := "sha256ToHex(code)";
+          };
           case null { return #err("LOST WASM_CODE"); };
         };
       };

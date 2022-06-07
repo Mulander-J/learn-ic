@@ -27,3 +27,5 @@ export const createActor = (canisterId:string, idl: any, options?:any) => {
     ...options?.actorOptions,
   });
 };
+
+export const ActorMWCN = createActor(canisters.MWCM.canisterId, canisters.MWCM.idlFactory)

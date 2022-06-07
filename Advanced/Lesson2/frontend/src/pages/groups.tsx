@@ -1,7 +1,8 @@
 import React, { useState, useCallback, useEffect, useMemo } from "react"
 import useFetch from "@/hooks/useFetch"
 import { useCanister, useConnect } from "@connect2ic/react"
-import { Modal, Button, Message, toaster, Loader } from 'rsuite'
+import { Modal, Button, Message, toaster, Loader, Whisper, Tooltip } from 'rsuite'
+import { MessageQuestion } from 'iconsax-react'
 import { errHandle } from "@/utils"
 import UserAvatar from "@/components/UserAvatar"
 import LinkBtn from "@/components/LinkBtn"
@@ -57,10 +58,17 @@ export default function PageGroups() {
     return (
       <div>
         <LinkBtn name="proposal">Goto propose</LinkBtn>
-        <p className="my-2">
-          <label>PassNum: </label>
-          <span className="text-green-400">{pn.toString()}/{list?.length || 0}</span>
-        </p>           
+        <p className="my-4">
+          <Whisper speaker={<Tooltip>PassNum is the basis for the success of the proposal.
+When the number of members is less than PassNum, the proposal is approved by one vote. On the contrary, every time a new member joins, PassNum will be self-increasing</Tooltip>}>            
+            <div className="flex w-min">
+              <label>PassNum</label>
+              <MessageQuestion className="mx-2" size="16" color="#FF8A65"/>
+              <span className="mx-2">: </span>
+              <span className="text-green-400">{pn.toString()}</span>
+            </div>            
+          </Whisper>                     
+        </p>       
         <div className="grid gap-y-4 text-center">
           {
             (list?.length || 0) <= 0 

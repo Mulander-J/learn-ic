@@ -37,7 +37,7 @@ export default function AddPropose() {
 
   const [open, setOpen] = useState(false)
   const [isLoading, setLoad] = useState(false)
-  const [formValue, setFormValue] = useState<any>(initFormValue);
+  const [formValue, setFormValue] = useState<any>(initFormValue)
 
   const handleOpen = () => setOpen(true)
   const handleClose = () => setOpen(false)
@@ -45,41 +45,54 @@ export default function AddPropose() {
     handleClose()
     navigate('/') 
   }
-  const uploadWasm = (file:any)=>{
-    console.log('uploadWasm',file)
-  }
+
   const onSubmit = useCallback(async ()=>{
     if(isLoading) return
     try{
       if(!isConnected){  throw Error('Please Connect!') }
+
       if (!formRef?.current.check()) { throw Error('Form Error') }
-      const {pType,canisterId,wasm_code} = formValue
-      const _canisterId = await PrincipalFrTxt(canisterId)
+
+      const { pType, canisterId, wasm_code } = formValue
+
+      const _canisterId = await PrincipalFrTxt(canisterId)      
       if(!_canisterId && pType !== 'create'){ throw Error('Please input correct canisterId!') }
-      // const wasm_blob:any = new Blob(wasm_code.file, wasm_code.type)
-      const wasm_blob:any = []
-      if(!wasm_blob && pType == 'install'){ throw Error('Please upload WASM Code!') }
+
+      let wasm_blob: any | [number] = null
+      if(pType == 'install'){
+        if(!wasm_code){
+          throw Error('Please upload WASM Code!') 
+        }else{
+          const arrBuffer  = await wasm_code.arrayBuffer()
+          wasm_blob = Array.from(new Uint8Array(arrBuffer))
+          // wasm_blob = new Uint8Array(arrBuffer)
+          if(!wasm_blob){ throw Error('File Convert Failed!') }
+        }
+      }
+      // const res: any = await MWCM.test(wasm_blob)
+      // console.log("res", res)
+
       const payloads = [
         {[pType]:null},
         _canisterId ? [_canisterId] : [],
-        wasm_code ? [wasm_blob] : []
+        wasm_blob ? [wasm_blob] : []
       ]
       console.log('[payloads]', payloads)
 
       setLoad(true)
-      // const res: any = MWCM.propose(payloads)
-      // if(res?.err){
-      //   toaster.push(<Message showIcon type="error">{res?.err}</Message>)
-      // } else if(res?.ok){
-      //   toaster.push(<Message showIcon type="success">Propose Success! ID: {res?.ok}</Message>)
-      // }
+      const res: any = await MWCM.propose(...payloads)
+      if(res?.err){
+        toaster.push(<Message showIcon type="error">{res?.err}</Message>)
+      } else if(res?.ok){
+        toaster.push(<Message showIcon type="success">Propose Success! ID: {res?.ok}</Message>)
+      }
     }catch(err: any){
       const msg = errHandle(err)
       toaster.push(<Message showIcon type="error">{msg}</Message>)
     }finally{
       setLoad(false)
     }
-  },[MWCM,isConnected,formValue,formRef])
+  },[MWCM,isConnected,isLoading,formRef,formValue])
 
 
   return (
@@ -110,9 +123,13 @@ export default function AddPropose() {
         {
           formValue?.pType === 'install'
           && (
-            <Form.Group controlId="wasm_code">
+            <Form.Group>
               <Form.ControlLabel>WASM Code</Form.ControlLabel>
-              <Uploader accept='.wasm' action="" autoUpload={false} onChange={uploadWasm}/>                
+              <Uploader 
+                accept='.wasm' action="" 
+                autoUpload={false} 
+                onChange={files=>{formValue.wasm_code = (files?.[0]?.blobFile || null)}}
+              />                
             </Form.Group>
           )
         }

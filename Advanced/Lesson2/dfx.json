@@ -3,6 +3,15 @@
     "MWCM": {
       "main": "backend/main.mo",
       "type": "motoko"
+    },
+    "uptownDaoUI":{ 
+      "frontend": {
+        "entrypoint": "frontend/dist/index.html"
+      },
+      "source": [
+        "frontend/dist/"
+      ],
+      "type": "assets"
     }
   },
   "defaults": {

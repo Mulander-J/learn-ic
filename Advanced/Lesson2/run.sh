@@ -8,9 +8,9 @@ echo "===>RUN WAY="$1
 if [ $1 == "deploy" ]
 then
   echo "===>Deploy"
-  echo "===>Deployer Principal:" $(dfx identity get-principal)
-  dfx deploy --argument='(vec {principal "'$(dfx identity get-principal)'";}, 2)'
-  # dfx deploy --network=ic --argument='(vec {principal "'$(dfx identity get-principal)'";}, 2)'
+  # echo "===>Deployer Principal:" $(dfx identity get-principal)
+  # dfx deploy --argument='(vec {principal "'$(dfx identity get-principal)'";}, 2)'
+  dfx deploy --network=ic --argument='(vec {principal "'$(dfx identity get-principal)'";}, 2)'
 elif [ $1 == "fetch" ]
 then
   echo "===>Fetch Groups"
